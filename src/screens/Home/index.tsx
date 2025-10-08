@@ -23,7 +23,7 @@ import { PayGoodsForm } from './components/PayGoodsForm';
 import { TransactionsList } from './components/TransactionsList';
 import { useNavigation } from '@react-navigation/native';
 import { HomeStackScreens } from '../../navigation/navigation.constants';
-import { useSMSListener } from '../../common/hooks/useSMSListner';
+import { useSMSListener } from '../../common/hooks/useSMSListener';
 
 const styles = StyleSheet.create({
   quickActionContainer: {
