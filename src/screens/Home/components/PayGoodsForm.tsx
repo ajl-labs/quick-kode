@@ -13,17 +13,19 @@ import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { MOMO_USSD_CODES } from '../../../common/helpers/ussd.momo.helper';
 import { NumberInput } from '../../../common/components/Input/NumberInput';
+import { amountSchema } from '../../../common/helpers/currency.helpers';
+import { moderateScale } from 'react-native-size-matters';
 
 const validationSchema = Yup.object().shape({
   paymentCode: Yup.string().required('Required'),
-  amount: Yup.number().min(1, 'Too small').required('Required'),
+  ...amountSchema,
 });
 const styles = StyleSheet.create({
   container: {
     gap: ThemeSpacings.lg,
   },
   input: {
-    height: 56,
+    height: moderateScale(56),
   },
 });
 

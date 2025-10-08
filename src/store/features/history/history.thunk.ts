@@ -1,0 +1,36 @@
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+
+import { camelCase } from 'lodash';
+export const postTransactionData = createAsyncThunk(
+  'history/postTransactionData',
+  async (transactionData: ITransactionData, thunkAPI) => {
+    const config = __DEV__
+      ? require('../../../../config.development.json')
+      : require('../../../../config.production.json');
+    try {
+      const response = await axios.post(
+        config.N8N_WEBHOOK_URL,
+        transactionData,
+        {
+          auth: {
+            username: config.N8N_WEBHOOK_USERNAME,
+            password: config.N8N_WEBHOOK_PASSWORD,
+          },
+        },
+      );
+      if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
+        return thunkAPI.rejectWithValue('Invalid response data: expected a non-empty array');
+      }
+      const data = response.data[0];
+      return Object.keys(data).reduce((acc, key) => {
+        acc[camelCase(key)] = data[key];
+        return acc;
+      }, {} as Record<string, any>);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        (error as any).message || 'Failed to post transaction data',
+      );
+    }
+  },
+);

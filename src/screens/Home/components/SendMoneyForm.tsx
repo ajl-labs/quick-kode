@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Alert,
   Keyboard,
@@ -10,29 +11,26 @@ import {
 } from 'react-native';
 import { Button, Text, TextInput, useTheme } from 'react-native-paper';
 import { Icon } from '../../../common/components';
-import React, { useEffect } from 'react';
 import { ThemeSpacings } from '../../../config/theme';
 import { selectContactPhone } from 'react-native-select-contact';
 import { removeCountryCode } from '../../../common/helpers';
 import * as Yup from 'yup';
-import { useFormik, validateYupSchema } from 'formik';
+import { useFormik } from 'formik';
 import { MOMO_USSD_CODES } from '../../../common/helpers/ussd.momo.helper';
 import { NumberInput } from '../../../common/components/Input/NumberInput';
-import { reverseFormatCurrency } from '../../../common/helpers/currency.helpers';
+import { amountSchema } from '../../../common/helpers/currency.helpers';
+import { moderateScale } from 'react-native-size-matters';
 
 const validationSchema = Yup.object().shape({
   phoneNumber: Yup.string().required('Required'),
-  amount: Yup.number()
-    .transform(reverseFormatCurrency)
-    .min(1, 'Too small')
-    .required('Required'),
+  ...amountSchema,
 });
 const styles = StyleSheet.create({
   container: {
     gap: ThemeSpacings.lg,
   },
   input: {
-    height: 56,
+    height: moderateScale(56),
   },
 });
 
