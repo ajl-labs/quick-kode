@@ -1,3 +1,4 @@
+import * as Yup from 'yup';
 export const formatCurrency = (amount: number | string | null): string => {
   if (!amount || isNaN(parseFloat(amount as string))) {
     return '---';
@@ -21,4 +22,11 @@ export const reverseFormatCurrency = (
     return parsed === '' ? 0 : Number(parsed);
   }
   return value;
+};
+
+export const amountSchema = {
+  amount: Yup.number()
+    .transform(reverseFormatCurrency)
+    .min(1, 'Too small')
+    .required('Required'),
 };

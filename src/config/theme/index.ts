@@ -1,4 +1,5 @@
 import { MD3LightTheme, MD3DarkTheme, MD3Theme } from 'react-native-paper';
+import { moderateScale } from 'react-native-size-matters';
 export * from './theme.utils';
 
 // Light Theme
@@ -28,7 +29,7 @@ export const lightTheme: MD3Theme = {
     error: '#D32F2F',
     onError: '#FFFFFF',
   },
-  roundness: 4,
+  roundness: moderateScale(4),
 };
 
 // Dark Theme
@@ -58,5 +59,5 @@ export const darkTheme: MD3Theme = {
     error: '#CF6679',
     onError: '#000000',
   },
-  roundness: 4,
+  roundness: moderateScale(4),
 };

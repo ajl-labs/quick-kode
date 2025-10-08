@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { StatusBar, StyleSheet, useColorScheme } from 'react-native';
 import { ActivityIndicator, PaperProvider } from 'react-native-paper';
 import { darkTheme, lightTheme, Navigation } from './src';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { checkAccessibilityPermission } from './src/common/helpers';

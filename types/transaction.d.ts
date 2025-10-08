@@ -10,3 +10,9 @@ interface ITransaction {
   description?: string;
   transactionId?: string;
 }
+
+interface ITransactionData {
+  sender: string;
+  message: string;
+  phoneNumber: string;
+}

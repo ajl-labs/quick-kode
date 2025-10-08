@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Container } from '../../common/Container';
 import { Text } from 'react-native-paper';
 import { Alert, StyleSheet, View } from 'react-native';
@@ -23,6 +23,7 @@ import { PayGoodsForm } from './components/PayGoodsForm';
 import { TransactionsList } from './components/TransactionsList';
 import { useNavigation } from '@react-navigation/native';
 import { HomeStackScreens } from '../../navigation/navigation.constants';
+import { useSMSListener } from '../../common/hooks/useSMSListner';
 
 const styles = StyleSheet.create({
   quickActionContainer: {
@@ -38,16 +39,20 @@ const styles = StyleSheet.create({
     width: '100%',
     flexWrap: 'wrap',
     ...globalStyles.horizontalSpacing,
+    marginTop: ThemeSpacings.md,
   },
 });
 
 type QuickActionType = keyof typeof MOMO_USSD_CODES;
 type BottomSheetContentType = QuickActionType | 'FULL_HISTORY_VIEW';
+
 export const HomeScreen = () => {
   const navigation = useNavigation();
   const sheetRef = useRef<BottomSheetModal>(null);
   const { dismiss } = useBottomSheetModal();
   const { loading, action, setAction } = useUSSDEvent();
+  const _response = useSMSListener();
+
   const [bottomSheetContentType, setBottomSheetContentType] =
     React.useState<BottomSheetContentType>();
 
@@ -125,6 +130,7 @@ export const HomeScreen = () => {
 
     return null;
   }, [action, bottomSheetContentType, loading]);
+
   return (
     <Container>
       <View style={styles.statSection}>

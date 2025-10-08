@@ -1,10 +1,12 @@
+import { moderateScale } from 'react-native-size-matters';
+
 export const ThemeSpacings = {
   none: 0,
-  xxs: 2,
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 40,
+  xxs: moderateScale(2),
+  xs: moderateScale(4),
+  sm: moderateScale(8),
+  md: moderateScale(16),
+  lg: moderateScale(24),
+  xl: moderateScale(32),
+  xxl: moderateScale(40),
 };
