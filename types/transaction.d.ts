@@ -15,4 +15,5 @@ interface ITransactionData {
   sender: string;
   message: string;
   phoneNumber: string;
+  timestamp: number;
 }

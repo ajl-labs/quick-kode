@@ -45,7 +45,7 @@ export const useSMSListener = () => {
     const startListener = async () => {
       const hasPermission = await requestSmsPermission();
       if (hasPermission) {
-        SmsListener.startSmsListener()
+        SmsListener.startListening()
           .then((res: string) => console.log(res))
           .catch((err: Error) => console.error(err));
       }
@@ -55,26 +55,32 @@ export const useSMSListener = () => {
 
     const subscription = smsListenerEmitter.addListener(
       'onSmsReceived',
-      async (event: { message: string; sender: string }) => {
-        Alert.alert(`New SMS from ${event.sender}`, event.message);
+      async (event: Record<string, string>) => {
+        console.log('SMS Received Event:', event);
         try {
           setMessage(event.message);
           await dispatch(
             postTransactionData({
               message: event.message,
               sender: event.sender,
+              timestamp: Number.parseInt(event.timestamp),
               phoneNumber: '+250789277275',
             }),
           ).unwrap();
+          Alert.alert(`Transaction Completed`, event.message);
         } catch (error) {
-          console.error('Error posting SMS data:', error);
+          console.log('Error posting SMS data', error);
+          Alert.alert(
+            `Error posting SMS data`,
+            (error as any).message || error,
+          );
         }
       },
     );
 
     return () => {
-      SmsListener.stopSmsListener()
-        .then((res: string) => console.log(res))
+      SmsListener.stopListening()
+        ?.then((res: string) => console.log(res))
         .catch((err: Error) => console.error(err));
       subscription.remove();
     };
