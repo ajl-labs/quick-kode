@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store';
-import { postTransactionData } from '../../store/features/history/history.thunk';
+import { postTransactionData } from '../../store/features/transactions/transaction.thunk';
 
 const { SmsListener } = NativeModules;
 const smsListenerEmitter = new NativeEventEmitter(SmsListener);
@@ -56,7 +56,6 @@ export const useSMSListener = () => {
     const subscription = smsListenerEmitter.addListener(
       'onSmsReceived',
       async (event: Record<string, string>) => {
-        console.log('SMS Received Event:', event);
         try {
           setMessage(event.message);
           await dispatch(

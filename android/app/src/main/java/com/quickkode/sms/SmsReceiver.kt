@@ -51,7 +51,7 @@ class SmsReceiver : BroadcastReceiver() {
             val isMMoney = listOf(sender, displayOriginatingAddress)
                 .any { it?.lowercase()?.contains("m-money".lowercase()) == true }
 
-            if (processedMessages.contains(messageId) || !isMMoney) {
+            if (processedMessages.contains(messageId)) {
                 Log.d("SmsReceiver", "Event stopped: Duplicate or M-Money message")
                 return
             }

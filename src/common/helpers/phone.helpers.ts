@@ -14,7 +14,7 @@ export const removeCountryCode = (phone?: string) => {
 
 export const getProviderFromPhone = (
   phone?: string,
-): ITransaction['provider'] => {
+): ITransactionPayload['provider'] => {
   if (!phone) return 'Unknown';
   const cleaned = removeCountryCode(phone);
   if (cleaned.startsWith('078') || cleaned.startsWith('079')) {

@@ -2,14 +2,11 @@ import { createSlice } from '@reduxjs/toolkit';
 import { createSelector } from '@reduxjs/toolkit';
 
 import { RootState } from '../..';
-import { postTransactionData } from './history.thunk';
 
 const initialState: {
   history: IHistoryData[];
-  transaction: Record<string, any>[];
 } = {
   history: [],
-  transaction: [],
 };
 
 const historySlice = createSlice({
@@ -29,11 +26,6 @@ const historySlice = createSlice({
         entry.label = entry.label ? '' : label;
       }
     },
-  },
-  extraReducers: builder => {
-    builder.addCase(postTransactionData.fulfilled, (state, action) => {
-      state.transaction.push(action.payload);
-    });
   },
 });
 

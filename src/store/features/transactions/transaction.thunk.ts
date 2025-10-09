@@ -19,16 +19,8 @@ export const postTransactionData = createAsyncThunk(
           },
         },
       );
-      if (
-        !response.data ||
-        !Array.isArray(response.data) ||
-        response.data.length === 0
-      ) {
-        return thunkAPI.rejectWithValue(
-          'Invalid response data: expected a non-empty array',
-        );
-      }
-      const data = response.data[0];
+
+      const data = response.data[0] ?? response.data;
       return Object.keys(data).reduce((acc, key) => {
         acc[camelCase(key)] = data[key];
         return acc;

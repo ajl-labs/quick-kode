@@ -1,4 +1,4 @@
-interface ITransaction {
+interface ITransactionPayload {
   balance?: string | null;
   name?: string;
   amount?: string;
@@ -16,4 +16,16 @@ interface ITransactionData {
   message: string;
   phoneNumber: string;
   timestamp: number;
+}
+
+interface ITransaction {
+  amount: number;
+  date: string;
+  fees: number;
+  message: string;
+  phoneNumber: string;
+  recipient: string;
+  sender: string;
+  timestamp: number;
+  type: 'DEBIT' | 'CREDIT';
 }

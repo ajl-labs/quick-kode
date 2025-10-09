@@ -1,24 +1,20 @@
 import { HistoryCard } from '../../common/components/Card/HistoryCard';
 import { FlatList } from 'react-native';
 import { useSelector } from 'react-redux';
-import { selectHistoryEntries } from '../../store/features/history/history.slice';
-import { USS_HISTORY_ACTION_TITLE } from '../../common/helpers';
 import globalStyles from '../../common/styles/global.styles';
+import { selectAllTransactions } from '../../store/features/transactions/transaction.slice';
 
 export const HistoryScreen = () => {
-  const data = useSelector(selectHistoryEntries);
-
-  const _renderItem = ({ item }: { item: IHistoryData }) => (
-    <HistoryCard
-      title={USS_HISTORY_ACTION_TITLE[item.action] || item.action}
-      content={item.text}
-    />
+  const transactions = useSelector(selectAllTransactions);
+  console.log(transactions);
+  const _renderItem = ({ item }: { item: ITransaction }) => (
+    <HistoryCard title={item.type} content={item.message} />
   );
   return (
-    <FlatList
-      data={data}
+    <FlatList<ITransaction>
+      data={transactions}
       renderItem={_renderItem}
-      keyExtractor={item => item.id}
+      keyExtractor={item => item.timestamp.toString()}
       contentContainerStyle={globalStyles.flatListContent}
     />
   );

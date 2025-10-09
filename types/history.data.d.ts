@@ -4,5 +4,5 @@ interface IHistoryData {
   text: string;
   timestamp: number;
   label?: string;
-  transaction?: ITransaction;
+  transaction?: ITransactionPayload;
 }
