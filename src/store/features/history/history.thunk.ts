@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 
 import { camelCase } from 'lodash';
 export const postTransactionData = createAsyncThunk(
@@ -19,8 +19,14 @@ export const postTransactionData = createAsyncThunk(
           },
         },
       );
-      if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
-        return thunkAPI.rejectWithValue('Invalid response data: expected a non-empty array');
+      if (
+        !response.data ||
+        !Array.isArray(response.data) ||
+        response.data.length === 0
+      ) {
+        return thunkAPI.rejectWithValue(
+          'Invalid response data: expected a non-empty array',
+        );
       }
       const data = response.data[0];
       return Object.keys(data).reduce((acc, key) => {
@@ -28,6 +34,11 @@ export const postTransactionData = createAsyncThunk(
         return acc;
       }, {} as Record<string, any>);
     } catch (error) {
+      if (isAxiosError(error)) {
+        console.error('Axios error response:', error.response?.data);
+      } else {
+        console.error('Unexpected error:', error);
+      }
       return thunkAPI.rejectWithValue(
         (error as any).message || 'Failed to post transaction data',
       );

@@ -1,4 +1,4 @@
-package com.quickkode
+package com.quickkode.sms
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule
