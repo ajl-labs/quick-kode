@@ -1,13 +1,16 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../..';
 import { to_snake_case } from '../../../common/helpers/utils';
+import { WEBHOOK_ACTIONS_KEY } from '../../../config/data/webhook.actions';
 
 const initialState: {
   transactionLabels: Record<string, TransactionLabel>;
   webhooks: Record<string, IWebhookData>;
+  webhookAuth: { username: string; password: string };
 } = {
   transactionLabels: {},
   webhooks: {},
+  webhookAuth: { username: '', password: '' },
 };
 
 const settingsSlice = createSlice({
@@ -34,22 +37,41 @@ const settingsSlice = createSlice({
       delete state.transactionLabels[to_snake_case(action.payload.name)];
     },
 
-    addWebhook(state, action: { payload: IWebhookData; type: string }) {
+    addWebhook(
+      state,
+      action: {
+        payload: IWebhookData & { key: WEBHOOK_ACTIONS_KEY };
+        type: string;
+      },
+    ) {
+      const { key, ...data } = action.payload;
       state.webhooks = {
         ...state.webhooks,
-        [action.payload.url]: action.payload,
+        [key]: { ...data, failed: false },
       };
     },
 
+    addWebhookAuth(
+      state,
+      action: {
+        payload: { username: string; password: string };
+        type: string;
+      },
+    ) {
+      state.webhookAuth = action.payload;
+    },
     removeWebhook(state, action: { payload: { url: string }; type: string }) {
       delete state.webhooks[action.payload.url];
     },
 
     markWebhookAsFailed(
       state,
-      action: { payload: { url: string; failed: boolean }; type: string },
+      action: {
+        payload: { failed: boolean; key: WEBHOOK_ACTIONS_KEY };
+        type: string;
+      },
     ) {
-      const webhook = state.webhooks[action.payload.url];
+      const webhook = state.webhooks[action.payload.key];
       if (webhook) {
         webhook.failed = action.payload.failed;
       }
@@ -65,6 +87,7 @@ export const {
   addWebhook,
   removeWebhook,
   markWebhookAsFailed,
+  addWebhookAuth,
 } = actions;
 
 export default reducer;
@@ -76,3 +99,6 @@ export const selectWebhooks = createSelector(
   (state: RootState) => state.settings.webhooks,
   webhooks => Object.values(webhooks || {}),
 );
+
+export const selectWebhookAuth = (state: RootState) =>
+  state.settings.webhookAuth;

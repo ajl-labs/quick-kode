@@ -1,7 +1,7 @@
 import React from 'react';
 import { icons } from '../../../assets/icons';
 import { useTheme } from 'react-native-paper';
-import { TouchableOpacity } from 'react-native';
+import { moderateScale } from 'react-native-size-matters';
 
 export interface IconProps {
   name: keyof typeof icons;
@@ -20,8 +20,8 @@ export const Icon: React.FC<IconProps> = ({
 
   return (
     <IconComponent
-      height={size}
-      width={size}
+      height={moderateScale(size)}
+      width={moderateScale(size)}
       fill={color || theme.colors.onPrimary}
       {...props}
     />

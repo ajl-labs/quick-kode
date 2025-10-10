@@ -5,10 +5,13 @@ import {
   StyleSheet,
   Keyboard,
   View,
+  TouchableOpacity,
 } from 'react-native';
 import {
   Button,
   ButtonProps,
+  Modal,
+  Portal,
   Text,
   TextInput,
   TextInputProps,
@@ -17,6 +20,9 @@ import {
 import { Icon, IconProps } from '../Icon';
 import { ThemeSpacings } from '../../../config/theme';
 import { NumberInput } from '../Input/NumberInput';
+import { CheckBox } from '../CheckBox';
+import globalStyles from '../../styles/global.styles';
+import { moderateScale } from 'react-native-size-matters';
 
 const styles = StyleSheet.create({
   container: {
@@ -26,6 +32,11 @@ const styles = StyleSheet.create({
   },
   inputContainer: { width: '100%' },
   button: { width: '100%' },
+  selectorModalContainer: {
+    width: '80%',
+    alignSelf: 'center',
+    padding: ThemeSpacings.md,
+  },
 });
 
 interface FormContainerProps {
@@ -49,6 +60,7 @@ interface FromInputProps extends TextInputProps {
   errorMessage?: string;
   secret?: boolean;
 }
+
 export const FormInput: React.FC<FromInputProps> = ({
   rightIcon,
   leftIcon,
@@ -110,6 +122,71 @@ export const FormInput: React.FC<FromInputProps> = ({
   );
 };
 
+interface SelectorInputProps extends Omit<FromInputProps, 'editable'> {
+  options?: { label: string; value: string }[];
+}
+
+export const SelectorInput: React.FC<SelectorInputProps> = ({
+  options = [],
+  value,
+  onChangeText,
+  placeholder,
+  label,
+  ...props
+}) => {
+  const theme = useTheme();
+  const [isOptionVisible, setIsOptionsVisible] = useState<boolean>(false);
+  const openOptions = () => setIsOptionsVisible(true);
+  const closeOptions = () => setIsOptionsVisible(false);
+
+  return (
+    <>
+      <Portal>
+        <Modal
+          visible={isOptionVisible}
+          onDismiss={closeOptions}
+          contentContainerStyle={[
+            styles.selectorModalContainer,
+            {
+              backgroundColor: theme.colors.background,
+              borderRadius: theme.roundness * 2,
+            },
+          ]}
+        >
+          <View style={[globalStyles.gap]}>
+            <Text variant="titleMedium">{label || placeholder}</Text>
+            <View style={[globalStyles.gapSm]}>
+              {options.map(option => (
+                <CheckBox
+                  key={option.value}
+                  title={option.label}
+                  checked={value === option.value}
+                  onPress={() => {
+                    const newValue = value === option.value ? '' : option.value;
+                    onChangeText?.(newValue);
+                    if (newValue) setIsOptionsVisible(false);
+                  }}
+                />
+              ))}
+            </View>
+          </View>
+        </Modal>
+      </Portal>
+      <TouchableOpacity onPress={openOptions}>
+        <FormInput
+          editable={false}
+          rightIcon="CaretDown"
+          onRightIconPress={openOptions}
+          value={value}
+          placeholder={placeholder}
+          label={label}
+          {...props}
+        />
+      </TouchableOpacity>
+    </>
+  );
+};
+
 interface FormButtonProps extends Omit<ButtonProps, 'children'> {
   title: string;
   iconName?: IconProps['name'];
@@ -136,4 +213,4 @@ export const FormButton: React.FC<FormButtonProps> = ({
     </Button>
   );
 };
-export default { FormContainer, FormInput, FormButton };
+export default { FormContainer, FormInput, FormButton, SelectorInput };

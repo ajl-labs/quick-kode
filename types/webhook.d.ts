@@ -4,4 +4,5 @@ interface IWebhookData {
   password?: string;
   paths?: string[];
   failed?: boolean;
+  action: string;
 }

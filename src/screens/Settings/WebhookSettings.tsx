@@ -1,5 +1,4 @@
-import { useRef } from 'react';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { useRef, useState } from 'react';
 import {
   Button,
   Divider,
@@ -7,43 +6,86 @@ import {
   Text,
   useTheme,
 } from 'react-native-paper';
-import { FlatList, View } from 'react-native';
+import {
+  Alert,
+  FlatList,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import { Container } from '../../common/Container';
-import { CustomBottomSheet } from '../../common/components/CustomBottomSheet';
-import Form from '../../common/components/Form';
-import * as Yup from 'yup';
+import {
+  CustomBottomSheet,
+  CustomBottomSheetHandles,
+} from '../../common/components/CustomBottomSheet';
+
 import { Icon } from '../../common/components';
-import { FormikHelpers, useFormik } from 'formik';
+import { FormikHelpers } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addWebhook,
+  addWebhookAuth,
+  removeWebhook,
+  selectWebhookAuth,
   selectWebhooks,
 } from '../../store/features/settings/settings.slice';
 import globalStyles from '../../common/styles/global.styles';
 import { moderateScale } from 'react-native-size-matters';
-
-const webhookSchema = Yup.object().shape({
-  url: Yup.string().required('Webhook URL is required'),
-  username: Yup.string(),
-  password: Yup.string(),
-});
+import { FABGroup } from '../../common/components/FABGroup';
+import { WebhookForm } from './components/WebhookForm';
+import { WebhookAuthForm } from './components/WebhookAuthForm';
+import { pick } from 'lodash';
+import { Swipeable } from '../../common/components/Swipeable';
+import { WEBHOOK_ACTIONS_KEY } from '../../config/data/webhook.actions';
 
 export const WebhookSettings = () => {
-  const sheetRef = useRef<BottomSheetModal>(null);
+  const webhooksList = useSelector(selectWebhooks);
+  const webhooksAuth = useSelector(selectWebhookAuth);
+  const bottomSheetRef = useRef<CustomBottomSheetHandles>(null);
+  const [formType, setFormType] = useState<'webhook' | 'webhook-auth'>(
+    'webhook',
+  );
+  const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
+  const [selectedWebhook, setSelectedWebhook] =
+    useState<Pick<IWebhookData, 'url' | 'action'>>();
+
   const theme = useTheme();
   const dispatch = useDispatch();
-  const webhooksList = useSelector(selectWebhooks);
 
-  const handleSubmit = async (
+  const handleWebhookSubmit = async (
     data: IWebhookData,
     { resetForm, setSubmitting }: FormikHelpers<any>,
   ) => {
     try {
       setSubmitting(true);
-      dispatch(addWebhook(data));
+      dispatch(
+        addWebhook({
+          ...data,
+          key: data.action as WEBHOOK_ACTIONS_KEY,
+        }),
+      );
       await setTimeout(() => {
         resetForm();
-        sheetRef.current?.dismiss();
+        bottomSheetRef.current?.dismiss();
+      }, 500);
+    } catch (error) {
+    } finally {
+      setSubmitting(false);
+    }
+  };
+  const handleWebhookAuthSubmit = async (
+    data: Pick<IWebhookData, 'username' | 'password'>,
+    { resetForm, setSubmitting }: FormikHelpers<any>,
+  ) => {
+    try {
+      setSubmitting(true);
+      // Dispatch an action to save webhook auth details
+      dispatch(
+        addWebhookAuth({ username: data.username!, password: data.password! }),
+      );
+      await setTimeout(() => {
+        resetForm();
+        bottomSheetRef.current?.dismiss();
       }, 500);
     } catch (error) {
     } finally {
@@ -51,116 +93,152 @@ export const WebhookSettings = () => {
     }
   };
 
-  const formik = useFormik({
-    initialValues: { url: '', username: '', password: '' },
-    validationSchema: webhookSchema,
-    onSubmit: (values, options) => {
-      const transformedValue = webhookSchema.cast(values);
-      handleSubmit(
+  const handleOpenSheet = (name: 'webhook' | 'webhook-auth') => {
+    setFormType(name);
+    bottomSheetRef.current?.present();
+  };
+
+  const deleteWebhookAlert = (url: string) =>
+    Alert.alert(
+      'Webhook Delete',
+      'Are you sure you want remove this webhook?',
+      [
         {
-          url: transformedValue.url,
-          username: transformedValue.username,
-          password: transformedValue.password,
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
         },
-        options,
-      );
-    },
-  });
+        {
+          text: 'OK',
+          onPress: () => {
+            dispatch(removeWebhook({ url }));
+          },
+        },
+      ],
+    );
 
   const renderWebhookItem = ({ item }: { item: IWebhookData }) => {
     const color = item.failed ? theme.colors.error : theme.colors.primary;
     return (
-      <View>
-        <View style={[globalStyles.spacedRow, globalStyles.fullWidth]}>
-          <View style={[globalStyles.row, globalStyles.gap]}>
-            <Icon name="Webhook" color={color} />
-            <Text variant="bodyMedium" style={{ color }}>
-              {item.url}
-            </Text>
-          </View>
+      <Swipeable
+        rightAction={
           <IconButton
-            icon={props => <Icon name="Edit" {...props} />}
-            size={moderateScale(15)}
-            onPress={() => {
-              formik.setValues({
-                url: item.url,
-                username: item.username || '',
-                password: item.password || '',
-              });
-              sheetRef.current?.present();
-            }}
-            iconColor={color}
-            containerColor={`${color}20`}
+            icon={props => <Icon name="Delete" {...props} />}
+            onPress={deleteWebhookAlert.bind(null, item.url)}
+            containerColor={`${theme.colors.error}`}
+            iconColor={theme.colors.background}
+            style={[globalStyles.noRadius, { height: '100%' }]}
           />
-        </View>
+        }
+        style={[globalStyles.horizontalSpacing]}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            setSelectedWebhook(item);
+            handleOpenSheet('webhook');
+          }}
+          style={[
+            globalStyles.row,
+            globalStyles.gap,
+            globalStyles.fullWidth,
+            {
+              height: moderateScale(60),
+            },
+          ]}
+        >
+          <Icon
+            name={item.action.includes('GET') ? 'Download' : 'Upload'}
+            color={color}
+          />
+          <Text
+            variant="bodyMedium"
+            style={{
+              color,
+              flex: 1,
+            }}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {item.url}
+          </Text>
+        </TouchableOpacity>
         <Divider />
-      </View>
+      </Swipeable>
     );
   };
-  return (
-    <>
-      <Container>
-        <Text variant="titleLarge">Webhook Settings</Text>
+
+  const renderListHeader = (
+    <Container>
+      <View style={[globalStyles.gap, { marginBottom: moderateScale(10) }]}>
         <Text variant="bodyMedium">
           A webhook is a way for apps to send real-time data to other services.
           Here, you can configure the endpoint where collected data will be sent
           and fetched. Webhooks help automate data sharing between QuickKode and
           your chosen service.
         </Text>
-        <Button
-          mode="outlined"
-          onPress={() => sheetRef.current?.present()}
-          icon={props => <Icon name="Webhook" {...props} />}
-        >
-          Add Webhook
-        </Button>
-        <FlatList
-          data={webhooksList}
-          keyExtractor={item => item.url}
-          renderItem={renderWebhookItem}
+      </View>
+      {!webhooksList.length && (
+        <View style={[globalStyles.row, globalStyles.gap]}>
+          <Button
+            mode="contained"
+            icon={props => <Icon {...props} name="Add" />}
+            onPress={() => handleOpenSheet('webhook')}
+          >
+            Webhook
+          </Button>
+          <Button
+            mode="outlined"
+            icon={props => <Icon {...props} name="Settings" />}
+            onPress={() => handleOpenSheet('webhook-auth')}
+          >
+            Webhook Config
+          </Button>
+        </View>
+      )}
+    </Container>
+  );
+
+  return (
+    <View style={[globalStyles.flex]}>
+      {webhooksList.length > 0 && (
+        <FABGroup
+          visible={!bottomSheetOpen}
+          options={[
+            {
+              icon: props => <Icon {...props} name="Webhook" />,
+              label: 'Add Webhook',
+              onPress: () => handleOpenSheet('webhook'),
+            },
+            {
+              icon: props => <Icon {...props} name="Settings" />,
+              label: 'Configure Webhook',
+              onPress: () => handleOpenSheet('webhook-auth'),
+            },
+          ]}
         />
-      </Container>
-      <CustomBottomSheet ref={sheetRef}>
-        <Form.FormContainer>
-          <Form.FormInput
-            label="Webhook URL"
-            placeholder="https://example.com"
-            leftIcon="Link"
-            onChangeText={formik.handleChange('url')}
-            errorMessage={formik.errors.url}
-            value={formik.values.url}
+      )}
+
+      <FlatList
+        ListHeaderComponent={renderListHeader}
+        data={webhooksList}
+        keyExtractor={item => item.action}
+        renderItem={renderWebhookItem}
+        contentContainerStyle={[globalStyles.flexGrow, globalStyles.gapSm]}
+      />
+
+      <CustomBottomSheet ref={bottomSheetRef} onOpenChange={setBottomSheetOpen}>
+        {formType === 'webhook-auth' ? (
+          <WebhookAuthForm
+            onSubmit={handleWebhookAuthSubmit}
+            initialValues={pick(webhooksAuth, ['username', 'password'])}
           />
-          <View>
-            <Text variant="labelSmall">
-              Webhook authorization, now we are supporting basic auth.
-            </Text>
-            <Form.FormInput
-              label="Username"
-              placeholder="Enter your username"
-              onChangeText={formik.handleChange('username')}
-              errorMessage={formik.errors.username}
-              value={formik.values.username}
-            />
-          </View>
-          <Form.FormInput
-            label="Password"
-            placeholder="Enter your password"
-            leftIcon="Lock"
-            onChangeText={formik.handleChange('password')}
-            errorMessage={formik.errors.password}
-            value={formik.values.password}
-            secret
-            returnKeyType="done"
-            returnKeyLabel="Submit"
+        ) : (
+          <WebhookForm
+            onSubmit={handleWebhookSubmit}
+            initialValues={selectedWebhook}
           />
-          <Form.FormButton
-            title="Save Webhook"
-            disabled={!formik.isValid}
-            loading={formik.isSubmitting}
-            onPress={() => formik.handleSubmit()}
-          />
-        </Form.FormContainer>
+        )}
       </CustomBottomSheet>
-    </>
+    </View>
   );
 };

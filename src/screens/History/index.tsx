@@ -6,15 +6,21 @@ import { selectAllTransactions } from '../../store/features/transactions/transac
 
 export const HistoryScreen = () => {
   const transactions = useSelector(selectAllTransactions);
-  console.log(transactions);
-  const _renderItem = ({ item }: { item: ITransaction }) => (
-    <HistoryCard title={item.type} content={item.message} />
-  );
+  const _renderItem = ({ item }: { item: IDataBaseRecord<ITransaction> }) => {
+    return (
+      <HistoryCard
+        title={item.type === 'CREDIT' ? item.sender : item.recipient}
+        content={item.message}
+        createdAt={item.created_at}
+        leftBorder={item.type !== 'CREDIT'}
+      />
+    );
+  };
   return (
-    <FlatList<ITransaction>
+    <FlatList<IDataBaseRecord<ITransaction>>
       data={transactions}
       renderItem={_renderItem}
-      keyExtractor={item => item.timestamp.toString()}
+      keyExtractor={item => item.id}
       contentContainerStyle={globalStyles.flatListContent}
     />
   );

@@ -48,7 +48,9 @@ function App(): React.JSX.Element {
               ]}
             >
               <BottomSheetModalProvider>
-                <Navigation theme={theme} />
+                <GestureHandlerRootView>
+                  <Navigation theme={theme} />
+                </GestureHandlerRootView>
               </BottomSheetModalProvider>
             </GestureHandlerRootView>
           </PaperProvider>

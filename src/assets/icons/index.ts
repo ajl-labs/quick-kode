@@ -25,6 +25,13 @@ import EyeOff from './eye-off.svg';
 import Lock from './lock.svg';
 import Link from './link.svg';
 import Edit from './edit.svg';
+import ClaudSync from './cloud-sync.svg';
+import CaretDown from './caret-down.svg';
+import Add from './add.svg';
+import Delete from './delete.svg';
+import AddNote from './add-note.svg';
+import Download from './download.svg';
+import Upload from './upload.svg';
 
 export const icons = {
   ArrowTopRight,
@@ -53,4 +60,11 @@ export const icons = {
   Lock,
   Link,
   Edit,
+  ClaudSync,
+  CaretDown,
+  Add,
+  Delete,
+  AddNote,
+  Download,
+  Upload,
 };

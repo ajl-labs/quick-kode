@@ -1,7 +1,10 @@
 import { StyleSheet } from 'react-native';
 import { ThemeSpacings } from '../../config/theme';
+import { moderateScale } from 'react-native-size-matters';
 
 export default StyleSheet.create({
+  flex: { flex: 1 },
+  flexGrow: { flexGrow: 1 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -49,7 +52,8 @@ export default StyleSheet.create({
     paddingVertical: 0,
     paddingHorizontal: 0,
   },
-  flex: { flex: 1 },
   fullWidth: { width: '100%' },
   gap: { gap: ThemeSpacings.md },
+  gapSm: { gap: ThemeSpacings.sm },
+  noRadius: { borderRadius: 0 },
 });

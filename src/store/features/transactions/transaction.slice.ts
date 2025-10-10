@@ -3,7 +3,7 @@ import { RootState } from '../..';
 import { postTransactionData } from './transaction.thunk';
 
 const initialState: {
-  transactions: Record<string, ITransaction>;
+  transactions: Record<string, IDataBaseRecord<ITransaction>>;
 } = {
   transactions: {},
 };
@@ -14,16 +14,15 @@ const historySlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder.addCase(postTransactionData.fulfilled, (state, action) => {
-      // state.transactions.push(action.payload.body);
-      // state.transactions = {
-      //   ...state.transactions,
-      //   [action.payload.boy.id]: action.payload.body,
-      // };
+      state.transactions = {
+        ...state.transactions,
+        [action.payload.id]: action.payload,
+      };
     });
   },
 });
 
-const { actions, reducer } = historySlice;
+const { reducer } = historySlice;
 
 export default reducer;
 

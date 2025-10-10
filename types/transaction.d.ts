@@ -19,13 +19,15 @@ interface ITransactionData {
 }
 
 interface ITransaction {
-  amount: number;
-  date: string;
-  fees: number;
+  amount: string;
+  completed_at: string;
+  created_at: string;
+  fees: string;
+  id: string;
   message: string;
-  phoneNumber: string;
+  phone_number: string;
   recipient: string;
   sender: string;
-  timestamp: number;
   type: 'DEBIT' | 'CREDIT';
+  updated_at: string;
 }

@@ -9,15 +9,21 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
+  MigrationManifest,
 } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import createMigrate from 'redux-persist/es/createMigrate';
+import storeMigration from './store.migration';
 
 const REDUX_PERSIST_KEY = 'root';
 
-const persistConfig = {
+const persistConfig: any = {
   key: REDUX_PERSIST_KEY,
-  version: 1,
+  version: 2,
   storage: AsyncStorage,
+  migrate: createMigrate(storeMigration as unknown as MigrationManifest, {
+    debug: true,
+  }),
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

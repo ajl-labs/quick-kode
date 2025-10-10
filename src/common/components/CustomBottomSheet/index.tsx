@@ -25,6 +25,7 @@ export interface CustomBottomSheetHandles {
 interface CustomBottomSheetProps extends BottomSheetModalProps {
   initialIndex?: number;
   children: React.ReactNode;
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
 export const CustomBottomSheet = React.forwardRef<
@@ -52,9 +53,13 @@ export const CustomBottomSheet = React.forwardRef<
     },
   }));
 
-  const handleSheetChanges = useCallback((index: number) => {
-    setIndex(index);
-  }, []);
+  const handleSheetChanges = useCallback(
+    (index: number) => {
+      setIndex(index);
+      props.onOpenChange?.(index >= 0);
+    },
+    [props.onOpenChange],
+  );
 
   const handleKeyboardDidShow = useCallback(() => {
     setPreviousIndex(index);
