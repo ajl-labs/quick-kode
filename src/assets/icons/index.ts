@@ -19,6 +19,12 @@ import ArrowForward from './arrow-forward.svg';
 import ArrowBack from './arrow-back.svg';
 import Close from './close.svg';
 import Check from './check.svg';
+import Webhook from './webhook.svg';
+import EyeVisible from './eye-visible.svg';
+import EyeOff from './eye-off.svg';
+import Lock from './lock.svg';
+import Link from './link.svg';
+import Edit from './edit.svg';
 
 export const icons = {
   ArrowTopRight,
@@ -41,4 +47,10 @@ export const icons = {
   ArrowForward,
   Close,
   Check,
+  Webhook,
+  EyeVisible,
+  EyeOff,
+  Lock,
+  Link,
+  Edit,
 };

@@ -1,9 +1,13 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../..';
 import { to_snake_case } from '../../../common/helpers/utils';
 
-const initialState: { transactionLabels: Record<string, TransactionLabel> } = {
+const initialState: {
+  transactionLabels: Record<string, TransactionLabel>;
+  webhooks: Record<string, IWebhookData>;
+} = {
   transactionLabels: {},
+  webhooks: {},
 };
 
 const settingsSlice = createSlice({
@@ -29,14 +33,46 @@ const settingsSlice = createSlice({
     ) {
       delete state.transactionLabels[to_snake_case(action.payload.name)];
     },
+
+    addWebhook(state, action: { payload: IWebhookData; type: string }) {
+      state.webhooks = {
+        ...state.webhooks,
+        [action.payload.url]: action.payload,
+      };
+    },
+
+    removeWebhook(state, action: { payload: { url: string }; type: string }) {
+      delete state.webhooks[action.payload.url];
+    },
+
+    markWebhookAsFailed(
+      state,
+      action: { payload: { url: string; failed: boolean }; type: string },
+    ) {
+      const webhook = state.webhooks[action.payload.url];
+      if (webhook) {
+        webhook.failed = action.payload.failed;
+      }
+    },
   },
 });
 
 const { actions, reducer } = settingsSlice;
 
-export const { addTransactionLabel, removeTransactionLabel } = actions;
+export const {
+  addTransactionLabel,
+  removeTransactionLabel,
+  addWebhook,
+  removeWebhook,
+  markWebhookAsFailed,
+} = actions;
 
 export default reducer;
 
 export const selectTransactionLabels = (state: RootState) =>
   state.settings.transactionLabels;
+
+export const selectWebhooks = createSelector(
+  (state: RootState) => state.settings.webhooks,
+  webhooks => Object.values(webhooks || {}),
+);

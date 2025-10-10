@@ -9,6 +9,7 @@ import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
   BottomSheetModal,
+  BottomSheetModalProps,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import { useTheme } from 'react-native-paper';
@@ -21,7 +22,7 @@ export interface CustomBottomSheetHandles {
   dismiss: () => void;
 }
 
-interface CustomBottomSheetProps {
+interface CustomBottomSheetProps extends BottomSheetModalProps {
   initialIndex?: number;
   children: React.ReactNode;
 }
@@ -61,11 +62,14 @@ export const CustomBottomSheet = React.forwardRef<
   }, [index]);
 
   const handleKeyboardDidHide = useCallback(() => {
-    setIndex(previousIndex || 0);
+    // Restore previous index when keyboard hides
+    if (previousIndex >= 0) {
+      setIndex(previousIndex);
+    }
   }, [previousIndex]);
 
   useEffect(() => {
-    const keyboardSubscription = Keyboard.addListener(
+    const keyboardDidShowSubscription = Keyboard.addListener(
       'keyboardDidShow',
       handleKeyboardDidShow,
     );
@@ -74,10 +78,10 @@ export const CustomBottomSheet = React.forwardRef<
       handleKeyboardDidHide,
     );
     return () => {
-      keyboardSubscription.remove();
+      keyboardDidShowSubscription.remove();
       keyboardDidHideSubscription.remove();
     };
-  }, [index]);
+  }, [handleKeyboardDidShow, handleKeyboardDidHide]);
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -106,6 +110,7 @@ export const CustomBottomSheet = React.forwardRef<
       snapPoints={['50%', '80%', '100%']}
       onChange={handleSheetChanges}
       enablePanDownToClose={true}
+      detached
       handleIndicatorStyle={{ backgroundColor: theme.colors.onSurface }}
       backgroundStyle={{ backgroundColor: theme.colors.surface }}
       keyboardBehavior="interactive"

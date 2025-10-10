@@ -45,6 +45,11 @@ export default StyleSheet.create({
   verticalSpacing: {
     paddingVertical: ThemeSpacings.md,
   },
+  noSpacing: {
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+  },
   flex: { flex: 1 },
   fullWidth: { width: '100%' },
+  gap: { gap: ThemeSpacings.md },
 });

@@ -1,11 +1,11 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../..';
 import { postTransactionData } from './transaction.thunk';
 
 const initialState: {
-  transactions: ITransaction[];
+  transactions: Record<string, ITransaction>;
 } = {
-  transactions: [],
+  transactions: {},
 };
 
 const historySlice = createSlice({
@@ -14,7 +14,11 @@ const historySlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder.addCase(postTransactionData.fulfilled, (state, action) => {
-      state.transactions.push(action.payload.body);
+      // state.transactions.push(action.payload.body);
+      // state.transactions = {
+      //   ...state.transactions,
+      //   [action.payload.boy.id]: action.payload.body,
+      // };
     });
   },
 });
@@ -23,5 +27,7 @@ const { actions, reducer } = historySlice;
 
 export default reducer;
 
-export const selectAllTransactions = (state: RootState) =>
-  state.transactions.transactions;
+export const selectAllTransactions = createSelector(
+  (state: RootState) => state.transactions.transactions,
+  transactions => Object.values(transactions),
+);

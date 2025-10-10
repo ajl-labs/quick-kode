@@ -1,25 +1,14 @@
 import React from 'react';
-import {
-  Alert,
-  Keyboard,
-  KeyboardAvoidingView,
-  PermissionsAndroid,
-  Platform,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
-import { Button, Text, TextInput, useTheme } from 'react-native-paper';
-import { Icon } from '../../../common/components';
+import { Alert, PermissionsAndroid, Platform, StyleSheet } from 'react-native';
 import { ThemeSpacings } from '../../../config/theme';
 import { selectContactPhone } from 'react-native-select-contact';
 import { removeCountryCode } from '../../../common/helpers';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { MOMO_USSD_CODES } from '../../../common/helpers/ussd.momo.helper';
-import { NumberInput } from '../../../common/components/Input/NumberInput';
 import { amountSchema } from '../../../common/helpers/currency.helpers';
 import { moderateScale } from 'react-native-size-matters';
+import Form from '../../../common/components/Form';
 
 const validationSchema = Yup.object().shape({
   phoneNumber: Yup.string().required('Required'),
@@ -48,8 +37,6 @@ export const SendMoneyForm: React.FC<SendMoneyFormProps> = ({
   onConfirm,
   loading,
 }) => {
-  const theme = useTheme();
-
   const [contactName, setContactName] = React.useState('');
   const formik = useFormik({
     initialValues: { amount: '', phoneNumber: '' },
@@ -115,77 +102,47 @@ export const SendMoneyForm: React.FC<SendMoneyFormProps> = ({
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-      <KeyboardAvoidingView style={styles.container}>
-        <View>
-          <TextInput
-            keyboardType="phone-pad"
-            mode="outlined"
-            label={contactName.trim().slice(0, 15) ?? 'Phone Number'}
-            style={styles.input}
-            left={
-              <TextInput.Icon
-                icon={props => <Icon name="Phone" {...props} />}
-              />
-            }
-            right={
-              <TextInput.Icon
-                icon={props => <Icon name="AccountBox" {...props} />}
-                onPress={pickContact}
-              />
-            }
-            value={formik.values.phoneNumber}
-            error={
-              formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)
-            }
-            onChangeText={formik.handleChange('phoneNumber')}
-            onBlur={formik.handleBlur('phoneNumber')}
-          />
-          {formik.touched.phoneNumber && formik.errors.phoneNumber ? (
-            <Text style={{ color: theme.colors.error }}>
-              {formik.errors.phoneNumber}
-            </Text>
-          ) : null}
-        </View>
-        <View>
-          <NumberInput
-            keyboardType="decimal-pad"
-            mode="outlined"
-            label="Amount"
-            style={styles.input}
-            left={
-              <TextInput.Icon icon={props => <Icon name="Cash" {...props} />} />
-            }
-            value={formik.values.amount}
-            onChangeText={formik.handleChange('amount')}
-            onBlur={formik.handleBlur('amount')}
-            error={formik.touched.amount && Boolean(formik.errors.amount)}
-          />
-          {formik.touched.amount && formik.errors.amount ? (
-            <Text style={{ color: theme.colors.error }}>
-              {formik.errors.amount}
-            </Text>
-          ) : null}
-        </View>
-
-        <Button
-          mode="contained"
-          icon={props => <Icon name="ArrowTopRight" {...props} />}
-          onPress={formik.handleSubmit as any}
-          loading={loading}
-          disabled={loading}
-        >
-          Send Money
-        </Button>
-        <Button
-          mode="outlined"
-          textColor={theme.colors.error}
-          onPress={handleCancel}
-          disabled={loading}
-        >
-          Cancel
-        </Button>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+    <Form.FormContainer>
+      <Form.FormInput
+        keyboardType="phone-pad"
+        mode="outlined"
+        label={contactName.trim().slice(0, 15) ?? 'Phone Number'}
+        style={styles.input}
+        leftIcon="Phone"
+        rightIcon="AccountBox"
+        onRightIconPress={pickContact}
+        value={formik.values.phoneNumber}
+        error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
+        onChangeText={formik.handleChange('phoneNumber')}
+        onBlur={formik.handleBlur('phoneNumber')}
+        errorMessage={formik.errors.phoneNumber}
+      />
+      <Form.FormInput
+        keyboardType="decimal-pad"
+        mode="outlined"
+        label="Amount"
+        style={styles.input}
+        leftIcon="Cash"
+        value={formik.values.amount}
+        onChangeText={formik.handleChange('amount')}
+        onBlur={formik.handleBlur('amount')}
+        error={formik.touched.amount && Boolean(formik.errors.amount)}
+        errorMessage={formik.errors.amount}
+      />
+      <Form.FormButton
+        title="Send Money"
+        mode="contained"
+        iconName="SendMoney"
+        onPress={formik.handleSubmit as any}
+        loading={loading}
+        disabled={loading}
+      />
+      <Form.FormButton
+        title="Cancel"
+        mode="outlined"
+        onPress={handleCancel}
+        disabled={loading}
+      />
+    </Form.FormContainer>
   );
 };

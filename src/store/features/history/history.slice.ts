@@ -44,11 +44,14 @@ export const selectRecentHistoryEntries = createSelector(
   sortedHistory => sortedHistory.slice(0, 5),
 );
 
-export const selectTransactionHistoryFees = (state: RootState) =>
-  state.history.history.reduce((total, entry) => {
-    if (entry.transaction?.fees) {
-      const fees = parseFloat(entry.transaction.fees);
-      return total + (isNaN(fees) ? 0 : fees);
-    }
-    return total;
-  }, 0);
+export const selectTransactionHistoryFees = createSelector(
+  (state: RootState) => state.history.history,
+  history =>
+    history.reduce((total, entry) => {
+      if (entry.transaction?.fees) {
+        const fees = parseFloat(entry.transaction.fees);
+        return total + (isNaN(fees) ? 0 : fees);
+      }
+      return total;
+    }, 0),
+);

@@ -1,37 +1,34 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { isAxiosError } from 'axios';
-
-import { camelCase } from 'lodash';
+import { RootState } from '../..';
+import { markWebhookAsFailed } from '../settings/settings.slice';
 export const postTransactionData = createAsyncThunk(
   'history/postTransactionData',
-  async (transactionData: ITransactionData, thunkAPI) => {
-    const config = __DEV__
-      ? require('../../../../config.development.json')
-      : require('../../../../config.production.json');
+  async (
+    transactionData: ITransactionData,
+    { getState, rejectWithValue, dispatch },
+  ) => {
+    let webhookUrl;
     try {
-      const response = await axios.post(
-        config.N8N_WEBHOOK_URL,
-        transactionData,
+      const webhooks = (getState() as RootState).settings.webhooks;
+      const { url, password = '', username = '' } = Object.values(webhooks)[0];
+      webhookUrl = url;
+      await axios.post(
+        `${url.trim()}/transactions/from-ai-prompt`.replaceAll(' ', ''),
         {
-          auth: {
-            username: config.N8N_WEBHOOK_USERNAME,
-            password: config.N8N_WEBHOOK_PASSWORD,
-          },
+          phone_number: transactionData.phoneNumber,
+          message: transactionData.message,
+          sender: transactionData.sender,
+        },
+        {
+          auth: { username, password },
         },
       );
-
-      const data = response.data[0] ?? response.data;
-      return Object.keys(data).reduce((acc, key) => {
-        acc[camelCase(key)] = data[key];
-        return acc;
-      }, {} as Record<string, any>);
     } catch (error) {
-      if (isAxiosError(error)) {
-        console.error('Axios error response:', error.response?.data);
-      } else {
-        console.error('Unexpected error:', error);
+      if (isAxiosError(error) && webhookUrl) {
+        dispatch(markWebhookAsFailed({ url: webhookUrl, failed: true }));
       }
-      return thunkAPI.rejectWithValue(
+      return rejectWithValue(
         (error as any).message || 'Failed to post transaction data',
       );
     }

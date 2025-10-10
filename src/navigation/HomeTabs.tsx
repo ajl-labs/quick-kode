@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { HomeScreen, SettingsScreen, HistoryScreen } from '../screens';
+import { HomeScreen, HistoryScreen } from '../screens';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon } from '../common/components';
 import { ThemeSpacings } from '../config/theme';
 import { HomeTabScreens } from './navigation.constants';
 import { HomeTabParamList } from './types';
+import { SettingsStack } from './SettingsStack';
 
 const Tab = createBottomTabNavigator<HomeTabParamList>();
 
@@ -42,10 +43,10 @@ export const HomeTabs = () => {
       />
       <Tab.Screen
         name={HomeTabScreens.Settings}
-        component={SettingsScreen}
+        component={SettingsStack}
         options={{
           tabBarLabel: 'Settings',
-          headerTitle: 'Settings',
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <Icon name="Settings" color={color} size={size} />
           ),

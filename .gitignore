@@ -77,3 +77,4 @@ yarn-error.log
 .env*
 google-services.json
 config.*.json
+quick-kode-server

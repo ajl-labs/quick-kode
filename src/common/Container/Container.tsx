@@ -3,12 +3,12 @@ import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { ThemeSpacings } from '../../config/theme';
 import globalStyles from '../styles/global.styles';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const screenContainerStyle = StyleSheet.create({
   container: {
     flex: 1,
     ...globalStyles.column,
+
     gap: ThemeSpacings.md,
   },
 });
@@ -23,6 +23,8 @@ export const Container: React.FC<ContainerProps> = ({ children, style }) => {
     <View
       style={[
         screenContainerStyle.container,
+        globalStyles.verticalSpacing,
+        globalStyles.horizontalSpacing,
         { backgroundColor: theme.colors.background },
         style, // Allow additional styles to be passed in
       ]}

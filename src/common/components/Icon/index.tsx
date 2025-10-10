@@ -1,6 +1,7 @@
 import React from 'react';
 import { icons } from '../../../assets/icons';
 import { useTheme } from 'react-native-paper';
+import { TouchableOpacity } from 'react-native';
 
 export interface IconProps {
   name: keyof typeof icons;

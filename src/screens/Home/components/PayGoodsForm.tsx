@@ -1,21 +1,12 @@
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
-import { Button, Text, TextInput, useTheme } from 'react-native-paper';
-import { Icon } from '../../../common/components';
+import { StyleSheet } from 'react-native';
 import React from 'react';
 import { ThemeSpacings } from '../../../config/theme';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { MOMO_USSD_CODES } from '../../../common/helpers/ussd.momo.helper';
-import { NumberInput } from '../../../common/components/Input/NumberInput';
 import { amountSchema } from '../../../common/helpers/currency.helpers';
 import { moderateScale } from 'react-native-size-matters';
-
+import Form from '../../../common/components/Form';
 const validationSchema = Yup.object().shape({
   paymentCode: Yup.string().required('Required'),
   ...amountSchema,
@@ -43,8 +34,6 @@ export const PayGoodsForm: React.FC<PayGoodsFormProps> = ({
   onConfirm,
   loading,
 }) => {
-  const theme = useTheme();
-
   const [contactName, setContactName] = React.useState('');
   const formik = useFormik({
     initialValues: { amount: '', paymentCode: '' },
@@ -66,71 +55,45 @@ export const PayGoodsForm: React.FC<PayGoodsFormProps> = ({
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-      <KeyboardAvoidingView style={styles.container}>
-        <View>
-          <TextInput
-            keyboardType="number-pad"
-            mode="outlined"
-            label={contactName.trim().slice(0, 15) ?? 'Payment Code'}
-            style={styles.input}
-            left={
-              <TextInput.Icon
-                icon={props => <Icon name="Numbers" {...props} />}
-              />
-            }
-            value={formik.values.paymentCode}
-            error={
-              formik.touched.paymentCode && Boolean(formik.errors.paymentCode)
-            }
-            onChangeText={formik.handleChange('paymentCode')}
-            onBlur={formik.handleBlur('paymentCode')}
-          />
-          {formik.touched.paymentCode && formik.errors.paymentCode ? (
-            <Text style={{ color: theme.colors.error }}>
-              {formik.errors.paymentCode}
-            </Text>
-          ) : null}
-        </View>
-        <View>
-          <NumberInput
-            keyboardType="decimal-pad"
-            mode="outlined"
-            label="Amount"
-            style={styles.input}
-            left={
-              <TextInput.Icon icon={props => <Icon name="Cash" {...props} />} />
-            }
-            value={formik.values.amount}
-            onChangeText={formik.handleChange('amount')}
-            onBlur={formik.handleBlur('amount')}
-            error={formik.touched.amount && Boolean(formik.errors.amount)}
-          />
-          {formik.touched.amount && formik.errors.amount ? (
-            <Text style={{ color: theme.colors.error }}>
-              {formik.errors.amount}
-            </Text>
-          ) : null}
-        </View>
-
-        <Button
-          mode="contained"
-          icon={props => <Icon name="ArrowTopRight" {...props} />}
-          onPress={formik.handleSubmit as any}
-          loading={loading}
-          disabled={loading}
-        >
-          Pay Goods/Service
-        </Button>
-        <Button
-          mode="outlined"
-          textColor={theme.colors.error}
-          onPress={handleCancel}
-          disabled={loading}
-        >
-          Cancel
-        </Button>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+    <Form.FormContainer>
+      <Form.FormInput
+        keyboardType="number-pad"
+        mode="outlined"
+        label={contactName.trim().slice(0, 15) ?? 'Payment Code'}
+        style={styles.input}
+        leftIcon="Numbers"
+        value={formik.values.paymentCode}
+        error={formik.touched.paymentCode && Boolean(formik.errors.paymentCode)}
+        onChangeText={formik.handleChange('paymentCode')}
+        onBlur={formik.handleBlur('paymentCode')}
+        errorMessage={formik.errors.paymentCode}
+      />
+      <Form.FormInput
+        keyboardType="decimal-pad"
+        mode="outlined"
+        label="Amount"
+        style={styles.input}
+        leftIcon="Cash"
+        value={formik.values.amount}
+        onChangeText={formik.handleChange('amount')}
+        onBlur={formik.handleBlur('amount')}
+        error={formik.touched.amount && Boolean(formik.errors.amount)}
+        errorMessage={formik.errors.amount}
+      />
+      <Form.FormButton
+        title="Pay Goods/Service"
+        mode="contained"
+        iconName="CreditCard"
+        onPress={formik.handleSubmit as any}
+        loading={loading}
+        disabled={loading}
+      />
+      <Form.FormButton
+        title="Cancel"
+        mode="outlined"
+        onPress={handleCancel}
+        disabled={loading}
+      />
+    </Form.FormContainer>
   );
 };

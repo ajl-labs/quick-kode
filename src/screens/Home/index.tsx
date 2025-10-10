@@ -132,7 +132,7 @@ export const HomeScreen = () => {
   }, [action, bottomSheetContentType, loading]);
 
   return (
-    <Container>
+    <Container style={globalStyles.noSpacing}>
       <View style={styles.statSection}>
         <StatCard title="Balance" value={formatCurrency(momoBalance)} />
         <StatCard title="Fees" value={formatCurrency(transactionFee)} />

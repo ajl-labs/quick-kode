@@ -8,3 +8,8 @@ export const HomeTabScreens = {
   History: 'History',
   Settings: 'Settings',
 };
+
+export const SettingsStackScreens = {
+  SettingsMenu: 'SettingsMenu',
+  WebhookSettings: 'WebhookSettings',
+};
