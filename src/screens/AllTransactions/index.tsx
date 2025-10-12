@@ -1,16 +1,13 @@
 import { useSelector } from 'react-redux';
-import { selectHistoryEntries } from '../../store/features/history/history.slice';
 import { TransactionsList } from '../Home/components/TransactionsList';
-import { Container } from '../../common/Container';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { selectAllTransactions } from '../../store/features/transactions/transaction.slice';
 
 export const AllTransactions = () => {
-  const fullHistoryData = useSelector(selectHistoryEntries);
+  const fullHistoryData = useSelector(selectAllTransactions);
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-      <Container>
-        <TransactionsList data={fullHistoryData} />
-      </Container>
+      <TransactionsList data={fullHistoryData} />
     </SafeAreaView>
   );
 };

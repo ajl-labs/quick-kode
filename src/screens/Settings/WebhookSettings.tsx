@@ -13,7 +13,7 @@ import {
   CustomBottomSheetHandles,
 } from '../../common/components/CustomBottomSheet';
 
-import { Icon } from '../../common/components';
+import { Icon, IconProps } from '../../common/components';
 import { FormikHelpers } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -30,7 +30,9 @@ import { WebhookForm } from './components/WebhookForm';
 import { WebhookAuthForm } from './components/WebhookAuthForm';
 import { pick } from 'lodash';
 import { Swipeable } from '../../common/components/Swipeable';
-import { WEBHOOK_ACTIONS_KEY } from '../../config/data/webhook.actions';
+import webhookActionMap, {
+  WEBHOOK_ACTIONS_KEY,
+} from '../../common/constants/webhook.actions';
 
 export const WebhookSettings = () => {
   const webhooksList = useSelector(selectWebhooks);
@@ -92,70 +94,86 @@ export const WebhookSettings = () => {
     bottomSheetRef.current?.present();
   };
 
-  const deleteWebhookAlert = (url: string) =>
-    Alert.alert(
-      'Webhook Delete',
-      'Are you sure you want remove this webhook?',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: 'OK',
-          onPress: () => {
-            dispatch(removeWebhook({ url }));
-          },
-        },
-      ],
-    );
+  const deleteWebhookAlert = (key: WEBHOOK_ACTIONS_KEY) => {
+    dispatch(removeWebhook({ key }));
+
+    // Alert.alert(
+    //   'Webhook Delete',
+    //   'Are you sure you want remove this webhook?',
+    //   [
+    //     {
+    //       text: 'Cancel',
+    //       onPress: () => console.log('Cancel Pressed'),
+    //       style: 'cancel',
+    //     },
+    //     {
+    //       text: 'OK',
+    //       onPress: () => {
+    //         dispatch(removeWebhook({ key }));
+    //       },
+    //     },
+    //   ],
+    // );
+  };
 
   const renderWebhookItem = ({ item }: { item: IWebhookData }) => {
     const color = item.failed ? theme.colors.error : theme.colors.primary;
+
+    let iconName: IconProps['name'] = 'Upload';
+    if (item.action.includes('GET')) {
+      iconName = 'Download';
+    } else if (item.action.includes('UPDATE')) {
+      iconName = 'Sync';
+    }
+
     return (
       <Swipeable
         rightAction={
           <IconButton
             icon={props => <Icon name="Delete" {...props} />}
-            onPress={deleteWebhookAlert.bind(null, item.url)}
+            onPress={deleteWebhookAlert.bind(
+              null,
+              item.action as WEBHOOK_ACTIONS_KEY,
+            )}
             containerColor={`${theme.colors.error}`}
             iconColor={theme.colors.background}
             style={[globalStyles.noRadius, { height: '100%' }]}
           />
         }
-        style={[globalStyles.horizontalSpacing]}
       >
-        <TouchableOpacity
-          onPress={() => {
-            setSelectedWebhook(item);
-            handleOpenSheet('webhook');
-          }}
+        <View
           style={[
-            globalStyles.row,
-            globalStyles.gap,
+            globalStyles.column,
             globalStyles.fullWidth,
             {
-              height: moderateScale(60),
+              padding: moderateScale(10),
             },
           ]}
         >
-          <Icon
-            name={item.action.includes('GET') ? 'Download' : 'Upload'}
-            color={color}
-          />
-          <Text
-            variant="bodyMedium"
-            style={{
-              color,
-              flex: 1,
-            }}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {item.url}
+          <Text variant="bodySmall" disabled>
+            {webhookActionMap.get(item.action as WEBHOOK_ACTIONS_KEY)?.label}
           </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedWebhook(item);
+              handleOpenSheet('webhook');
+            }}
+            style={[globalStyles.row, globalStyles.gap, globalStyles.fullWidth]}
+          >
+            <Icon name={iconName} color={color} />
+            <Text
+              variant="bodySmall"
+              style={{
+                color,
+                flex: 1,
+              }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {item.url}
+            </Text>
+          </TouchableOpacity>
+        </View>
         <Divider />
       </Swipeable>
     );

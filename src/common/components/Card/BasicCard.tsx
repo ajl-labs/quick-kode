@@ -17,12 +17,14 @@ interface BasicCardProps {
   roundness?: number;
   contentStyle?: StyleProp<ViewStyle>;
   style?: CardProps['style'];
+  outlineColor?: string;
 }
 export const BasicCard: React.FC<BasicCardProps> = ({
   children,
   roundness,
   contentStyle,
   style,
+  outlineColor,
 }) => {
   const theme = useTheme();
   return (
@@ -30,13 +32,17 @@ export const BasicCard: React.FC<BasicCardProps> = ({
       style={[styles.container, style]}
       contentStyle={[
         styles.content,
-        {
-          backgroundColor: 'rgba(0, 0, 0, 0)',
-          borderRadius: roundness || theme.roundness,
-        },
+        // {
+        //   backgroundColor: 'rgba(0, 0, 0, 0)',
+        //   borderRadius: roundness || theme.roundness,
+        // },
         contentStyle,
       ]}
       mode="outlined"
+      theme={{
+        roundness: roundness || theme.roundness,
+        colors: { outline: outlineColor || theme.colors.outline },
+      }}
     >
       {children}
     </Card>

@@ -25,7 +25,7 @@ import EyeOff from './eye-off.svg';
 import Lock from './lock.svg';
 import Link from './link.svg';
 import Edit from './edit.svg';
-import ClaudSync from './cloud-sync.svg';
+import Sync from './sync.svg';
 import CaretDown from './caret-down.svg';
 import Add from './add.svg';
 import Delete from './delete.svg';
@@ -60,7 +60,7 @@ export const icons = {
   Lock,
   Link,
   Edit,
-  ClaudSync,
+  Sync,
   CaretDown,
   Add,
   Delete,

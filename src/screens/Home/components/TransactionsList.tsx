@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Button,
   Chip,
@@ -8,13 +8,12 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { FlatList, TouchableOpacity, View } from 'react-native';
-import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import globalStyles from '../../../common/styles/global.styles';
 import {
   getProviderFromPhone,
   removeCountryCode,
 } from '../../../common/helpers/phone.helpers';
-import { TransactionHistoryItem } from './TransactionHistoryItem';
+import { TransactionListItem } from './TransactionListItem';
 
 import {
   formatDate,
@@ -24,14 +23,24 @@ import {
 } from '../../../common/helpers/date.helpers';
 import { formatCurrency } from '../../../common/helpers/currency.helpers';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectTransactionLabels } from '../../../store/features/settings/settings.slice';
+import {
+  selectTransactionLabelEnabled,
+  selectTransactionLabels,
+} from '../../../store/features/settings/settings.slice';
 import { ThemeSpacings } from '../../../config/theme';
 import { Icon } from '../../../common/components';
 import { addLabelToTransaction } from '../../../store/features/history/history.slice';
 import { to_snake_case } from '../../../common/helpers/utils';
+import {
+  TransactionCategory,
+  TransactionType,
+} from '../../../common/constants/enum';
+import { capitalize } from 'lodash';
+import { updateTransactionData } from '../../../store/features/transactions/transaction.thunk';
+import { AppDispatch } from '../../../store';
 
 interface TransactionsListProps {
-  data: IHistoryData[];
+  data: IDataBaseRecord<ITransaction>[];
   onViewAllPress?: () => void;
   title?: string;
 }
@@ -41,50 +50,66 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
   title,
 }) => {
   const theme = useTheme();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const transactionLabels = useSelector(selectTransactionLabels);
+  const transactionLabelEnabled = useSelector(selectTransactionLabelEnabled);
   const [showLabelDialog, setShowLabelDialog] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
-    useState<IHistoryData | null>(null);
+    useState<IDataBaseRecord<ITransaction> | null>(null);
 
-  const renderTransactionItem = ({ item }: { item: IHistoryData }) => {
-    const phoneNumber = removeCountryCode(item.transaction?.phoneNumber || '');
+  const renderTransactionItem = ({
+    item,
+  }: {
+    item: IDataBaseRecord<ITransaction>;
+  }) => {
+    const phoneNumber = removeCountryCode(item?.phone_number || '');
 
     let description: string = '';
-    if (item.action === 'SEND_MONEY') {
-      description = `Sent to ${item.transaction?.name}`;
+    if (item.transaction_category === TransactionCategory.TRANSFER) {
+      description = `Sent to ${item?.recipient}`;
       if (phoneNumber) {
         description += ` - ${removeCountryCode(phoneNumber)}`;
       }
-    } else if (item.action === 'BUY_AIRTIME') {
+    } else if (
+      item.transaction_category === TransactionCategory.AIRTIME_PURCHASE
+    ) {
       description = `Airtime purchase from ${
         getProviderFromPhone(phoneNumber) || 'Unknown'
       }`;
-    } else if (item.action === 'PAY_GOOD_SERVICE') {
-      description = `Paid to ${item.transaction?.name}, Code: ${item.transaction?.paymentCode}`;
+    } else if (
+      item.transaction_category === TransactionCategory.GOODS_PAYMENT
+    ) {
+      description = `Paid to ${item.recipient}, Code: ${
+        item?.payment_code || 'N/A'
+      }`;
+    } else if (item.transaction_category === TransactionCategory.WITHDRAWAL) {
+      description = `You have withdrawn money`;
     } else {
-      description = '';
+      description = `${capitalize(item.type)} transaction of unknown nature.`;
     }
+
     const extraProps = { rightUpText: '', rightBottomText: '' };
-    if (isToday(item.timestamp)) {
-      extraProps['rightUpText'] = formatRelativeTime(item.timestamp);
+    if (isToday(item.completed_at)) {
+      extraProps['rightUpText'] = formatRelativeTime(item.completed_at);
     } else {
-      extraProps['rightUpText'] = formatDate(item.timestamp, 'DD/MM/YY');
+      extraProps['rightUpText'] = formatDate(item.completed_at, 'DD/MM/YY');
     }
 
     if (item.label) {
       extraProps['rightBottomText'] = item.label;
     }
+
     return (
       <TouchableOpacity
         onLongPress={() => {
           setShowLabelDialog(true);
           setSelectedTransaction(item);
         }}
+        disabled={!transactionLabelEnabled}
       >
-        <TransactionHistoryItem
-          type={item.action}
-          title={formatCurrency(item.transaction?.amount || 0)}
+        <TransactionListItem
+          type={item.type}
+          title={formatCurrency(item.amount)}
           description={description}
           {...extraProps}
         />
@@ -112,14 +137,22 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
     return null;
   };
 
-  const handleAddLabelToTransaction = (
-    payload: Pick<IHistoryData, 'id' | 'label'>,
-  ) => {
-    dispatch(addLabelToTransaction(payload));
-  };
+  const handleAddLabelToTransaction = useCallback(
+    (label: string) => {
+      if (selectedTransaction)
+        dispatch(
+          updateTransactionData({
+            record: selectedTransaction,
+            payload: { label },
+          }),
+        );
+    },
+    [dispatch, selectedTransaction],
+  );
+
   return (
     <>
-      <FlatList
+      <FlatList<IDataBaseRecord<ITransaction>>
         data={data}
         keyExtractor={item => item.id}
         renderItem={renderTransactionItem}
@@ -151,10 +184,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
                     }
                     onPress={() => {
                       if (selectedTransaction?.id) {
-                        handleAddLabelToTransaction({
-                          id: selectedTransaction.id,
-                          label: label.name,
-                        });
+                        handleAddLabelToTransaction(label.name);
                       }
                       setShowLabelDialog(false);
                     }}

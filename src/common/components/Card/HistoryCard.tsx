@@ -10,25 +10,21 @@ interface HistoryCardProps {
   title: string;
   content: string;
   createdAt: Date;
-  leftBorder?: boolean;
+  highlighted?: boolean;
 }
 export const HistoryCard: React.FC<HistoryCardProps> = ({
   title,
   content,
   createdAt,
-  leftBorder,
+  highlighted,
 }) => {
   const theme = useTheme();
-  const borderStyle = leftBorder
-    ? {
-        borderLeftWidth: 4,
-        borderLeftColor: theme.colors.secondary,
-        borderTopLeftRadius: moderateScale(13),
-        borderBottomLeftRadius: moderateScale(13),
-      }
-    : {};
+
   return (
-    <BasicCard roundness={moderateScale(3)} contentStyle={[borderStyle]}>
+    <BasicCard
+      roundness={moderateScale(3)}
+      outlineColor={highlighted ? theme.colors.primary : theme.colors.outline}
+    >
       <View style={[globalStyles.row, globalStyles.spacedRow]}>
         <Text variant="labelMedium">{title}</Text>
         {/* <Text variant="bodySmall">{formatRelativeTime(createdAt)}</Text> */}

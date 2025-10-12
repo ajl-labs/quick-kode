@@ -1,7 +1,7 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../..';
 import { to_snake_case } from '../../../common/helpers/utils';
-import { WEBHOOK_ACTIONS_KEY } from '../../../config/data/webhook.actions';
+import { WEBHOOK_ACTIONS_KEY } from '../../../common/constants/webhook.actions';
 
 const initialState: {
   transactionLabels: Record<string, TransactionLabel>;
@@ -60,8 +60,12 @@ const settingsSlice = createSlice({
     ) {
       state.webhookAuth = action.payload;
     },
-    removeWebhook(state, action: { payload: { url: string }; type: string }) {
-      delete state.webhooks[action.payload.url];
+    removeWebhook(
+      state,
+      action: { payload: { key: WEBHOOK_ACTIONS_KEY }; type: string },
+    ) {
+      const { [action.payload.key]: _, ...rest } = state.webhooks;
+      state.webhooks = rest;
     },
 
     markWebhookAsFailed(
@@ -95,6 +99,10 @@ export default reducer;
 export const selectTransactionLabels = (state: RootState) =>
   state.settings.transactionLabels;
 
+export const selectTransactionLabelEnabled = createSelector(
+  (state: RootState) => state.settings.transactionLabels,
+  labels => Object.keys(labels).length > 0,
+);
 export const selectWebhooks = createSelector(
   (state: RootState) => state.settings.webhooks,
   webhooks => Object.values(webhooks || {}),

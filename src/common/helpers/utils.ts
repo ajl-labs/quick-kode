@@ -28,3 +28,18 @@ export const showAndroidToast = (
     50,
   );
 };
+
+export const replaceUrlPlaceholders = (
+  url: string,
+  data: Record<string, any>,
+): string => {
+  let modifiedUrl = url;
+  Object.keys(data).forEach(key => {
+    const placeholder = `:${key}`;
+    modifiedUrl = modifiedUrl.replace(
+      placeholder,
+      encodeURIComponent(String(data[key])),
+    );
+  });
+  return modifiedUrl;
+};

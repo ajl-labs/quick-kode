@@ -22,6 +22,7 @@ import { PayGoodsForm } from './components/PayGoodsForm';
 import { TransactionsList } from './components/TransactionsList';
 import { useNavigation } from '@react-navigation/native';
 import { HomeStackScreens } from '../../navigation/navigation.constants';
+import { selectRecentTransactions } from '../../store/features/transactions/transaction.slice';
 
 const styles = StyleSheet.create({
   quickActionContainer: {
@@ -54,7 +55,7 @@ export const HomeScreen = () => {
 
   const momoBalance = useSelector(selectMoMoBalance);
   const transactionFee = useSelector(selectTransactionHistoryFees);
-  const transactions = useSelector(selectRecentHistoryEntries);
+  const transactions = useSelector(selectRecentTransactions);
 
   const handleDailUSSD = async (key: QuickActionType, ussdCode: string) => {
     // setAction(key);

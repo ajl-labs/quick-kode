@@ -6,32 +6,46 @@ import { StyleSheet, View } from 'react-native';
 import globalStyles from '../../../common/styles/global.styles';
 import { DEVICE_DIMENSIONS } from '../../../common/components/constants';
 import { ThemeSpacings } from '../../../config/theme';
+import {
+  TransactionCategory,
+  TransactionType,
+} from '../../../common/constants/enum';
 
-interface TransactionHistoryItemProps {
-  type: IHistoryData['action'];
+interface TransactionListItemProps {
+  type: ITransaction['type'];
   title: string;
   description: string;
   rightUpText?: string;
   rightBottomText?: string;
+  iconType?: TransactionCategory | TransactionType;
 }
 
 type ItemExtraComponentProps = { color: string; style?: Style | undefined };
-export const TransactionHistoryItem: React.FC<TransactionHistoryItemProps> = ({
+export const TransactionListItem: React.FC<TransactionListItemProps> = ({
   type,
   title,
   description,
   rightUpText,
   rightBottomText,
+  iconType,
 }) => {
   const theme = useTheme();
-  const iconNames: Partial<Record<IHistoryData['action'], IconProps['name']>> =
-    {
-      SEND_MONEY: 'ArrowTopRight',
-      PAY_GOOD_SERVICE: 'CreditScore',
-      BUY_AIRTIME: 'PhonePause',
-    };
+  const iconNames: Partial<
+    Record<TransactionCategory | TransactionType | 'default', IconProps['name']>
+  > = {
+    DEBIT: 'ArrowTopRight',
+    CREDIT: 'ArrowBottomRight',
+    airtime_purchase: 'PhonePause',
+    goods_payment: 'CreditCard',
+    default: 'ArrowTopRight',
+  };
+
   const renderIcon = (props: ItemExtraComponentProps) => {
-    if (iconNames[type]) {
+    let iconName = type === 'DEBIT' ? iconNames.DEBIT : iconNames.CREDIT;
+    if (iconType && iconNames[iconType]) {
+      iconName = iconNames[iconType];
+    }
+    if (iconName) {
       return (
         <View
           style={[
@@ -43,7 +57,7 @@ export const TransactionHistoryItem: React.FC<TransactionHistoryItemProps> = ({
             },
           ]}
         >
-          <Icon name={iconNames[type]} color={props.color} size={28} />
+          <Icon name={iconName} color={props.color} size={28} />
         </View>
       );
     }

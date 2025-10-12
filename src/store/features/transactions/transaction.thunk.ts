@@ -2,12 +2,16 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { isAxiosError } from 'axios';
 import { RootState } from '../..';
 import { markWebhookAsFailed } from '../settings/settings.slice';
-import { WEBHOOK_ACTIONS_KEY } from '../../../config/data/webhook.actions';
-import { showAndroidToast } from '../../../common/helpers/utils';
+import { WEBHOOK_ACTIONS_KEY } from '../../../common/constants/webhook.actions';
+import {
+  replaceUrlPlaceholders,
+  showAndroidToast,
+} from '../../../common/helpers/utils';
 import {
   addPostTransactionRequest,
   removePostTransactionRequest,
 } from '../retryQueue/retry.queue.slice';
+import { omit } from 'lodash';
 
 export const postTransactionData = createAsyncThunk(
   'history/postTransactionData',
@@ -88,6 +92,35 @@ export const fetchTransactionData = createAsyncThunk(
         'LONG',
       );
       return;
+    }
+  },
+);
+
+export const updateTransactionData = createAsyncThunk(
+  'history/updateTransactionData',
+  async (
+    updateData: {
+      record: IDataBaseRecord<ITransaction>;
+      payload: Partial<ITransaction>;
+    },
+    { getState, rejectWithValue },
+  ) => {
+    try {
+      const { webhookAuth, webhooks } = (getState() as RootState).settings;
+      const { url } = webhooks[WEBHOOK_ACTIONS_KEY.UPDATE_TRANSACTION] || {};
+      if (!url) return;
+      const { data: responseData } = await axios.put(
+        replaceUrlPlaceholders(url.trim(), updateData.record),
+        omit(updateData.payload, 'id'),
+        { auth: webhookAuth },
+      );
+      return responseData;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.log(error.response);
+      }
+      showAndroidToast('Failed to update transaction data to webhook.', 'LONG');
+      return rejectWithValue('Failed to update transaction data to webhook.');
     }
   },
 );

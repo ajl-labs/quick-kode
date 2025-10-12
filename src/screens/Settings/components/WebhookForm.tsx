@@ -3,7 +3,7 @@ import Form from '../../../common/components/Form';
 import * as Yup from 'yup';
 import webhookActions, {
   WEBHOOK_ACTIONS_KEY,
-} from '../../../config/data/webhook.actions';
+} from '../../../common/constants/webhook.actions';
 import { FormikHelpers, useFormik } from 'formik';
 
 const webhookSchema = Yup.object().shape({
@@ -39,7 +39,7 @@ export const WebhookForm: React.FC<IWebhookFormProps> = ({
       <Form.SelectorInput
         label="Action Type"
         placeholder="Action Type"
-        leftIcon="ClaudSync"
+        leftIcon="Sync"
         onChangeText={handleChange('action')}
         options={Array.from(webhookActions.values())}
         value={values.action}

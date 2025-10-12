@@ -1,6 +1,10 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../..';
-import { fetchTransactionData, postTransactionData } from './transaction.thunk';
+import {
+  fetchTransactionData,
+  postTransactionData,
+  updateTransactionData,
+} from './transaction.thunk';
 
 const initialState: {
   transactions: Record<string, IDataBaseRecord<ITransaction>>;
@@ -34,6 +38,14 @@ const historySlice = createSlice({
             }, {} as Record<string, IDataBaseRecord<ITransaction>>),
           };
         }
+      })
+      .addCase(updateTransactionData.fulfilled, (state, action) => {
+        if (action.payload?.id) {
+          state.transactions[action.payload.id] = {
+            ...state.transactions[action.payload.id],
+            ...action.payload,
+          };
+        }
       });
   },
 });
@@ -45,4 +57,9 @@ export default reducer;
 export const selectAllTransactions = createSelector(
   (state: RootState) => state.transactions.transactions,
   transactions => Object.values(transactions),
+);
+
+export const selectRecentTransactions = createSelector(
+  selectAllTransactions,
+  transactions => transactions.slice(0, 5),
 );

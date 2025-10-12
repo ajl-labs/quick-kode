@@ -12,7 +12,7 @@ export const HistoryScreen = () => {
         title={item.type === 'CREDIT' ? item.sender : item.recipient}
         content={item.message}
         createdAt={item.created_at}
-        leftBorder={item.type !== 'CREDIT'}
+        highlighted={item.type === 'CREDIT'}
       />
     );
   };
