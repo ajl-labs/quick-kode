@@ -1,6 +1,6 @@
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../..';
-import { postTransactionData } from './transaction.thunk';
+import { fetchTransactionData, postTransactionData } from './transaction.thunk';
 
 const initialState: {
   transactions: Record<string, IDataBaseRecord<ITransaction>>;
@@ -13,12 +13,28 @@ const historySlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: builder => {
-    builder.addCase(postTransactionData.fulfilled, (state, action) => {
-      state.transactions = {
-        ...state.transactions,
-        [action.payload.id]: action.payload,
-      };
-    });
+    builder
+      .addCase(postTransactionData.fulfilled, (state, action) => {
+        if (action.payload?.id) {
+          state.transactions = {
+            ...state.transactions,
+            [action.payload.id]: action.payload,
+          };
+        }
+      })
+      .addCase(fetchTransactionData.fulfilled, (state, action) => {
+        const { data, total, page, limit } =
+          action.payload as PaginatedResponse<ITransaction>;
+        if (data && Array.isArray(data)) {
+          state.transactions = {
+            ...state.transactions,
+            ...data.reduce((acc, transaction) => {
+              acc[transaction.id] = transaction;
+              return acc;
+            }, {} as Record<string, IDataBaseRecord<ITransaction>>),
+          };
+        }
+      });
   },
 });
 

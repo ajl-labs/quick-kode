@@ -1,6 +1,6 @@
 export enum WEBHOOK_ACTIONS_KEY {
   POST_TRANSACTION = 'POST/transactions',
-  GET_TRANSACTION = 'GET/transactions',
+  FETCH_TRANSACTIONS = 'FETCH/transactions',
 }
 const actionsMap = new Map<
   WEBHOOK_ACTIONS_KEY,
@@ -11,8 +11,11 @@ const actionsMap = new Map<
     { label: 'Post Transaction', value: WEBHOOK_ACTIONS_KEY.POST_TRANSACTION },
   ],
   [
-    WEBHOOK_ACTIONS_KEY.GET_TRANSACTION,
-    { label: 'Fetch Transactions', value: WEBHOOK_ACTIONS_KEY.GET_TRANSACTION },
+    WEBHOOK_ACTIONS_KEY.FETCH_TRANSACTIONS,
+    {
+      label: 'Fetch Transactions',
+      value: WEBHOOK_ACTIONS_KEY.FETCH_TRANSACTIONS,
+    },
   ],
 ]);
 

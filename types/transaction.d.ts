@@ -11,11 +11,12 @@ interface ITransactionPayload {
   transactionId?: string;
 }
 
-interface ITransactionData {
+interface ITransactionPostPayload {
   sender: string;
   message: string;
   phoneNumber: string;
   timestamp: number;
+  messageId: string;
 }
 
 interface ITransaction {

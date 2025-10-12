@@ -1,4 +1,4 @@
-package com.quickkode
+package com.quickkode.ussd
 
 import android.content.ComponentName
 import android.content.Intent
@@ -44,23 +44,24 @@ class UssdModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMo
         reactApplicationContext.startActivity(intent)
     }
 
-    @ReactMethod
-    fun isAccessibilityServiceEnabled(promise: Promise) {
-        try {
-            val expectedComponentName = ComponentName(reactApplicationContext, UssdAccessibilityService::class.java)
-            val enabledServices = android.provider.Settings.Secure.getString(
-                reactApplicationContext.contentResolver,
-                android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-            )
+    // This is no longer needed as we are capturing the message and analyse it instead of the USSD response. 
+    // @ReactMethod
+    // fun isAccessibilityServiceEnabled(promise: Promise) {
+    //     try {
+    //         val expectedComponentName = ComponentName(reactApplicationContext, UssdAccessibilityService::class.java)
+    //         val enabledServices = android.provider.Settings.Secure.getString(
+    //             reactApplicationContext.contentResolver,
+    //             android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+    //         )
 
-            val isEnabled = enabledServices?.split(":")
-                ?.any { it.equals(expectedComponentName.flattenToString(), ignoreCase = true) } == true
+    //         val isEnabled = enabledServices?.split(":")
+    //             ?.any { it.equals(expectedComponentName.flattenToString(), ignoreCase = true) } == true
 
-            promise.resolve(isEnabled)
-        } catch (e: Exception) {
-            promise.reject("CHECK_ACCESSIBILITY_ERROR", e.message)
-        }
-    }
+    //         promise.resolve(isEnabled)
+    //     } catch (e: Exception) {
+    //         promise.reject("CHECK_ACCESSIBILITY_ERROR", e.message)
+    //     }
+    // }
 
     @ReactMethod
     fun addListener(eventName: String?) {

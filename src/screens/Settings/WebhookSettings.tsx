@@ -6,13 +6,7 @@ import {
   Text,
   useTheme,
 } from 'react-native-paper';
-import {
-  Alert,
-  FlatList,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import { Alert, FlatList, TouchableOpacity, View } from 'react-native';
 import { Container } from '../../common/Container';
 import {
   CustomBottomSheet,

@@ -64,6 +64,7 @@ class SmsReceiver : BroadcastReceiver() {
                 putString("sender", sender)
                 putString("timestamp", timestamp.toString())
                 putString("address", displayOriginatingAddress)
+                putString("messageId", messageId)
             }
 
             reactContext?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)

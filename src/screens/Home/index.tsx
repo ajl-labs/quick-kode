@@ -11,7 +11,6 @@ import { SendMoneyForm } from './components/SendMoneyForm';
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { StatCard } from '../../common/components/Card/StatCard';
 import { HomeQuickActions } from './components/HomeQuickActions';
-import { useUSSDEvent } from '../../common/hooks/useUSSDEvent';
 import { formatCurrency } from '../../common/helpers/currency.helpers';
 import { useSelector } from 'react-redux';
 import { selectMoMoBalance } from '../../store/features/momo/momo.slice';
@@ -23,7 +22,6 @@ import { PayGoodsForm } from './components/PayGoodsForm';
 import { TransactionsList } from './components/TransactionsList';
 import { useNavigation } from '@react-navigation/native';
 import { HomeStackScreens } from '../../navigation/navigation.constants';
-import { useSMSListener } from '../../common/hooks/useSMSListener';
 
 const styles = StyleSheet.create({
   quickActionContainer: {
@@ -50,8 +48,6 @@ export const HomeScreen = () => {
   const navigation = useNavigation();
   const sheetRef = useRef<BottomSheetModal>(null);
   const { dismiss } = useBottomSheetModal();
-  const { loading, action, setAction } = useUSSDEvent();
-  const _response = useSMSListener();
 
   const [bottomSheetContentType, setBottomSheetContentType] =
     React.useState<BottomSheetContentType>();
@@ -61,7 +57,7 @@ export const HomeScreen = () => {
   const transactions = useSelector(selectRecentHistoryEntries);
 
   const handleDailUSSD = async (key: QuickActionType, ussdCode: string) => {
-    setAction(key);
+    // setAction(key);
     return dialUSSD(ussdCode);
   };
 
@@ -114,7 +110,7 @@ export const HomeScreen = () => {
         <SendMoneyForm
           onCancel={dismiss}
           onConfirm={onConfirmSendMoney}
-          loading={loading && action === 'SEND_MONEY'}
+          //loading={loading && action === 'SEND_MONEY'}
         />
       );
     }
@@ -123,13 +119,13 @@ export const HomeScreen = () => {
         <PayGoodsForm
           onCancel={dismiss}
           onConfirm={onConfirmSendMoney}
-          loading={loading && action === 'PAY_GOOD_SERVICE'}
+          //loading={loading && action === 'PAY_GOOD_SERVICE'}
         />
       );
     }
 
     return null;
-  }, [action, bottomSheetContentType, loading]);
+  }, [bottomSheetContentType]);
 
   return (
     <Container style={globalStyles.noSpacing}>
@@ -146,8 +142,8 @@ export const HomeScreen = () => {
         handleCheckBalance={handleCheckBalance}
         handlePayGoodService={() => handleOpenBottomSheet('PAY_GOOD_SERVICE')}
         handleSendMoney={() => handleOpenBottomSheet('SEND_MONEY')}
-        currentCode={action}
-        loading={loading}
+        // currentCode={action}
+        // loading={loading}
       />
       <TransactionsList
         data={transactions}

@@ -5,3 +5,10 @@ interface DatabaseAttributes {
 }
 
 type IDataBaseRecord<T> = DatabaseAttributes & T;
+
+interface PaginatedResponse<T> {
+  data: IDataBaseRecord<T>[];
+  total: number;
+  page: number;
+  limit: number;
+}

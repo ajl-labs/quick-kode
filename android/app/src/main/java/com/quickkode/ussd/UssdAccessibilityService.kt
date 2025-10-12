@@ -1,4 +1,4 @@
-package com.quickkode
+package com.quickkode.ussd
 
 import android.accessibilityservice.AccessibilityService
 import android.view.accessibility.AccessibilityEvent
@@ -6,9 +6,10 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.util.Log
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.facebook.react.ReactApplication
-import com.quickkode.UssdModule
+import com.quickkode.ussd.UssdModule
 import com.facebook.react.bridge.Arguments
 
+// This is no longer needed as we are capturing the message and analyse it instead of the USSD response.
 class UssdAccessibilityService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {

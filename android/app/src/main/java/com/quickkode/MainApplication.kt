@@ -10,6 +10,7 @@ import com.facebook.react.ReactPackage
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.quickkode.sms.SmsListenerPackage
+import com.quickkode.ussd.UssdPackage
 
 class MainApplication : Application(), ReactApplication {
 

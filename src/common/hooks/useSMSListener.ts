@@ -9,6 +9,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store';
 import { postTransactionData } from '../../store/features/transactions/transaction.thunk';
+import { showAndroidToast } from '../helpers/utils';
 
 const { SmsListener } = NativeModules;
 const smsListenerEmitter = new NativeEventEmitter(SmsListener);
@@ -64,15 +65,11 @@ export const useSMSListener = () => {
               sender: event.sender,
               timestamp: Number.parseInt(event.timestamp),
               phoneNumber: '+250789277275',
+              messageId: event.messageId,
             }),
           ).unwrap();
-          Alert.alert(`Transaction Completed`, event.message);
         } catch (error) {
-          console.log('Error posting SMS data', error);
-          Alert.alert(
-            `Error posting SMS data`,
-            (error as any).message || error,
-          );
+          showAndroidToast(error as string, 'LONG');
         }
       },
     );

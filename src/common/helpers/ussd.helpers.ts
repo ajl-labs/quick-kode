@@ -3,6 +3,7 @@ import {
   NativeModules,
   PermissionsAndroid,
   Platform,
+  ToastAndroid,
 } from 'react-native';
 
 export const dialUSSD = async (ussdCode: string) => {
@@ -15,6 +16,13 @@ export const dialUSSD = async (ussdCode: string) => {
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
       NativeModules.UssdModule.dialUssdCode(ussdCode);
     } else {
+      ToastAndroid.showWithGravityAndOffset(
+        'Permission to dial USSD code denied.',
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+        25,
+        50,
+      );
       throw new Error(
         'Permission to make phone calls denied. Please enable it in settings.',
       );

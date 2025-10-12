@@ -1,13 +1,13 @@
 import * as React from 'react';
-import {DefaultTheme, NavigationContainer} from '@react-navigation/native';
-import {HomeStack} from './HomeStack';
-import {MD3Theme} from 'react-native-paper';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { HomeStack } from './HomeStack';
+import { MD3Theme } from 'react-native-paper';
 
 interface NavigationProps {
   theme: MD3Theme;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({theme}) => {
+export const Navigation: React.FC<NavigationProps> = ({ theme }) => {
   return (
     <NavigationContainer
       theme={{
@@ -21,7 +21,8 @@ export const Navigation: React.FC<NavigationProps> = ({theme}) => {
           border: theme.colors.outline,
           notification: DefaultTheme.colors.notification,
         },
-      }}>
+      }}
+    >
       <HomeStack />
     </NavigationContainer>
   );
