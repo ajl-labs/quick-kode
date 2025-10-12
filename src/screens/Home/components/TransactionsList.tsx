@@ -9,16 +9,11 @@ import {
 } from 'react-native-paper';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import globalStyles from '../../../common/styles/global.styles';
-import {
-  getProviderFromPhone,
-  removeCountryCode,
-} from '../../../common/helpers/phone.helpers';
 import { TransactionListItem } from './TransactionListItem';
 
 import {
   formatDate,
   formatRelativeTime,
-  formatTime,
   isToday,
 } from '../../../common/helpers/date.helpers';
 import { formatCurrency } from '../../../common/helpers/currency.helpers';
@@ -29,15 +24,10 @@ import {
 } from '../../../store/features/settings/settings.slice';
 import { ThemeSpacings } from '../../../config/theme';
 import { Icon } from '../../../common/components';
-import { addLabelToTransaction } from '../../../store/features/history/history.slice';
 import { to_snake_case } from '../../../common/helpers/utils';
-import {
-  TransactionCategory,
-  TransactionType,
-} from '../../../common/constants/enum';
-import { capitalize } from 'lodash';
 import { updateTransactionData } from '../../../store/features/transactions/transaction.thunk';
 import { AppDispatch } from '../../../store';
+import { extractTransactionSummary } from '../../../common/helpers/transaction.helper';
 
 interface TransactionsListProps {
   data: IDataBaseRecord<ITransaction>[];
@@ -62,32 +52,6 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
   }: {
     item: IDataBaseRecord<ITransaction>;
   }) => {
-    const phoneNumber = removeCountryCode(item?.phone_number || '');
-
-    let description: string = '';
-    if (item.transaction_category === TransactionCategory.TRANSFER) {
-      description = `Sent to ${item?.recipient}`;
-      if (phoneNumber) {
-        description += ` - ${removeCountryCode(phoneNumber)}`;
-      }
-    } else if (
-      item.transaction_category === TransactionCategory.AIRTIME_PURCHASE
-    ) {
-      description = `Airtime purchase from ${
-        getProviderFromPhone(phoneNumber) || 'Unknown'
-      }`;
-    } else if (
-      item.transaction_category === TransactionCategory.GOODS_PAYMENT
-    ) {
-      description = `Paid to ${item.recipient}, Code: ${
-        item?.payment_code || 'N/A'
-      }`;
-    } else if (item.transaction_category === TransactionCategory.WITHDRAWAL) {
-      description = `You have withdrawn money`;
-    } else {
-      description = `${capitalize(item.type)} transaction of unknown nature.`;
-    }
-
     const extraProps = { rightUpText: '', rightBottomText: '' };
     const transactionDate = item.completed_at || item.created_at;
 
@@ -112,7 +76,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
         <TransactionListItem
           type={item.type}
           title={formatCurrency(item.amount)}
-          description={description}
+          description={extractTransactionSummary(item)}
           {...extraProps}
         />
       </TouchableOpacity>

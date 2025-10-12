@@ -19,6 +19,7 @@ declare global {
     transaction_category?: TransactionCategory;
     payment_code?: string;
     transaction_reference?: string;
+    summary?: string;
   }
   interface ITransactionPayload {
     balance?: string | null;
