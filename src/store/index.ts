@@ -19,7 +19,7 @@ const REDUX_PERSIST_KEY = 'root';
 
 const persistConfig: any = {
   key: REDUX_PERSIST_KEY,
-  version: 2,
+  version: 3,
   storage: AsyncStorage,
   migrate: createMigrate(storeMigration as unknown as MigrationManifest, {
     debug: true,

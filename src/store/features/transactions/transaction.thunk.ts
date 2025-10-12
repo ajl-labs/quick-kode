@@ -21,8 +21,7 @@ export const postTransactionData = createAsyncThunk(
   ) => {
     try {
       const { webhookAuth, webhooks } = (getState() as RootState).settings;
-      const { url } = webhooks[WEBHOOK_ACTIONS_KEY.POST_TRANSACTION] || {};
-      console.log('Posting transaction data to webhook...');
+      const { url } = webhooks[WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT] || {};
       if (!url) return;
       const { data } = await axios.post(
         url.trim(),
@@ -32,12 +31,14 @@ export const postTransactionData = createAsyncThunk(
           sender: transactionData.sender,
           message_id: transactionData.messageId,
           message_timestamp: transactionData.timestamp,
+          aiEnabled: true,
         },
         { auth: webhookAuth },
       );
       dispatch(
         removePostTransactionRequest({ key: transactionData.messageId }),
       );
+      dispatch(fetchTransactionStats());
       return data;
     } catch (error) {
       console.log(error);
@@ -58,7 +59,7 @@ export const postTransactionData = createAsyncThunk(
       if (axiosError && error.response?.status !== 500) {
         dispatch(
           markWebhookAsFailed({
-            key: WEBHOOK_ACTIONS_KEY.POST_TRANSACTION,
+            key: WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT,
             failed: true,
           }),
         );
@@ -79,7 +80,7 @@ export const fetchTransactionData = createAsyncThunk(
   async (_, { getState }) => {
     try {
       const { webhookAuth, webhooks } = (getState() as RootState).settings;
-      const { url } = webhooks[WEBHOOK_ACTIONS_KEY.FETCH_TRANSACTIONS] || {};
+      const { url } = webhooks[WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT] || {};
       if (!url) return;
       const { data: responseData } = await axios.get(url.trim(), {
         auth: webhookAuth,
@@ -109,10 +110,10 @@ export const updateTransactionData = createAsyncThunk(
   ) => {
     try {
       const { webhookAuth, webhooks } = (getState() as RootState).settings;
-      const { url } = webhooks[WEBHOOK_ACTIONS_KEY.UPDATE_TRANSACTION] || {};
+      const { url } = webhooks[WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT] || {};
       if (!url) return;
       const { data: responseData } = await axios.put(
-        replaceUrlPlaceholders(url.trim(), updateData.record),
+        replaceUrlPlaceholders(`${url.trim()}/:id`, updateData.record),
         omit(updateData.payload, 'id'),
         { auth: webhookAuth },
       );
@@ -121,13 +122,38 @@ export const updateTransactionData = createAsyncThunk(
       if (isAxiosError(error)) {
         dispatch(
           markWebhookAsFailed({
-            key: WEBHOOK_ACTIONS_KEY.UPDATE_TRANSACTION,
+            key: WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT,
             failed: true,
           }),
         );
       }
       showAndroidToast('Failed to update transaction data to webhook.', 'LONG');
       return rejectWithValue('Failed to update transaction data to webhook.');
+    }
+  },
+);
+
+export const fetchTransactionStats = createAsyncThunk(
+  'stats/fetchTransactionStats',
+  async (_, { getState }) => {
+    try {
+      const { webhookAuth, webhooks } = (getState() as RootState).settings;
+      const { url } = webhooks[WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT] || {};
+      if (!url) return;
+      const { data } = await axios.get(`${url.trim()}/dashboard/stats`, {
+        auth: webhookAuth,
+      });
+      return data;
+    } catch (error) {
+      let errorMessage = 'Failed to fetch transaction stats from webhook.';
+      if (isAxiosError(error)) {
+        console.log(error.response);
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        }
+      }
+      showAndroidToast(errorMessage, 'LONG');
+      return;
     }
   },
 );

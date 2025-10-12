@@ -2,25 +2,45 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../..';
 import {
   fetchTransactionData,
+  fetchTransactionStats,
   postTransactionData,
   updateTransactionData,
 } from './transaction.thunk';
 
 const initialState: {
   transactions: Record<string, IDataBaseRecord<ITransaction>>;
+  stats: ITransactionStats;
 } = {
   transactions: {},
+  stats: {
+    totalTransactions: null,
+    totalFees: null,
+    balance: null,
+  },
 };
 
 const historySlice = createSlice({
   name: 'history',
   initialState,
-  reducers: {},
+  reducers: {
+    setTransactionStats(
+      state,
+      action: {
+        payload: Partial<ITransactionStats>;
+        type: string;
+      },
+    ) {
+      state.transactions.stats = {
+        ...state.transactions.stats,
+        ...action.payload,
+      };
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(postTransactionData.fulfilled, (state, action) => {
         if (action.payload?.id) {
-          state.transactions = {
+          state['transactions'] = {
             ...state.transactions,
             [action.payload.id]: action.payload,
           };
@@ -30,7 +50,7 @@ const historySlice = createSlice({
         const { data, total, page, limit } =
           action.payload as PaginatedResponse<ITransaction>;
         if (data && Array.isArray(data)) {
-          state.transactions = {
+          state['transactions'] = {
             ...state.transactions,
             ...data.reduce((acc, transaction) => {
               acc[transaction.id] = transaction;
@@ -46,11 +66,21 @@ const historySlice = createSlice({
             ...action.payload,
           };
         }
+      })
+      .addCase(fetchTransactionStats.fulfilled, (state, action) => {
+        if (action.payload) {
+          state['stats'] = {
+            ...state.transactions.stats,
+            ...action.payload,
+          };
+        }
       });
   },
 });
 
-const { reducer } = historySlice;
+const { actions, reducer } = historySlice;
+
+export const { setTransactionStats } = actions;
 
 export default reducer;
 
@@ -74,3 +104,6 @@ export const selectRecentTransactions = createSelector(
   selectAllTransactions,
   transactions => transactions.slice(0, 5),
 );
+
+export const selectTransactionStats = (state: RootState) =>
+  state.transactions.stats;

@@ -20,6 +20,7 @@ declare global {
     payment_code?: string;
     transaction_reference?: string;
     summary?: string;
+    transaction_reference: number;
   }
   interface ITransactionPayload {
     balance?: string | null;
@@ -40,5 +41,11 @@ declare global {
     phoneNumber: string;
     timestamp: number;
     messageId: string;
+  }
+
+  interface ITransactionStats {
+    balance: number | null;
+    totalTransactions: number | null;
+    totalFees: number | null;
   }
 }

@@ -12,17 +12,17 @@ import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { StatCard } from '../../common/components/Card/StatCard';
 import { HomeQuickActions } from './components/HomeQuickActions';
 import { formatCurrency } from '../../common/helpers/currency.helpers';
-import { useSelector } from 'react-redux';
-import { selectMoMoBalance } from '../../store/features/momo/momo.slice';
-import {
-  selectRecentHistoryEntries,
-  selectTransactionHistoryFees,
-} from '../../store/features/history/history.slice';
+import { useDispatch, useSelector } from 'react-redux';
 import { PayGoodsForm } from './components/PayGoodsForm';
 import { TransactionsList } from './components/TransactionsList';
 import { useNavigation } from '@react-navigation/native';
 import { HomeStackScreens } from '../../navigation/navigation.constants';
-import { selectRecentTransactions } from '../../store/features/transactions/transaction.slice';
+import {
+  selectRecentTransactions,
+  selectTransactionStats,
+} from '../../store/features/transactions/transaction.slice';
+import { fetchTransactionStats } from '../../store/features/transactions/transaction.thunk';
+import { AppDispatch } from '../../store';
 
 const styles = StyleSheet.create({
   quickActionContainer: {
@@ -46,6 +46,7 @@ type QuickActionType = keyof typeof MOMO_USSD_CODES;
 type BottomSheetContentType = QuickActionType | 'FULL_HISTORY_VIEW';
 
 export const HomeScreen = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation();
   const sheetRef = useRef<BottomSheetModal>(null);
   const { dismiss } = useBottomSheetModal();
@@ -53,12 +54,10 @@ export const HomeScreen = () => {
   const [bottomSheetContentType, setBottomSheetContentType] =
     React.useState<BottomSheetContentType>();
 
-  const momoBalance = useSelector(selectMoMoBalance);
-  const transactionFee = useSelector(selectTransactionHistoryFees);
   const transactions = useSelector(selectRecentTransactions);
+  const transactionStats = useSelector(selectTransactionStats);
 
   const handleDailUSSD = async (key: QuickActionType, ussdCode: string) => {
-    // setAction(key);
     return dialUSSD(ussdCode);
   };
 
@@ -95,6 +94,10 @@ export const HomeScreen = () => {
     }
   };
 
+  useEffect(() => {
+    dispatch(fetchTransactionStats());
+  }, []);
+
   const handleCheckBalance = () =>
     handleDailUSSD('CHECK_BALANCE', MOMO_USSD_CODES.CHECK_BALANCE);
   const handleBuyAirtime = () =>
@@ -108,21 +111,11 @@ export const HomeScreen = () => {
   const renderBottomSheetContent = useMemo(() => {
     if (bottomSheetContentType === 'SEND_MONEY') {
       return (
-        <SendMoneyForm
-          onCancel={dismiss}
-          onConfirm={onConfirmSendMoney}
-          //loading={loading && action === 'SEND_MONEY'}
-        />
+        <SendMoneyForm onCancel={dismiss} onConfirm={onConfirmSendMoney} />
       );
     }
     if (bottomSheetContentType === 'PAY_GOOD_SERVICE') {
-      return (
-        <PayGoodsForm
-          onCancel={dismiss}
-          onConfirm={onConfirmSendMoney}
-          //loading={loading && action === 'PAY_GOOD_SERVICE'}
-        />
-      );
+      return <PayGoodsForm onCancel={dismiss} onConfirm={onConfirmSendMoney} />;
     }
 
     return null;
@@ -131,8 +124,14 @@ export const HomeScreen = () => {
   return (
     <Container style={globalStyles.noSpacing}>
       <View style={styles.statSection}>
-        <StatCard title="Balance" value={formatCurrency(momoBalance)} />
-        <StatCard title="Fees" value={formatCurrency(transactionFee)} />
+        <StatCard
+          title="Balance"
+          value={formatCurrency(transactionStats.balance)}
+        />
+        <StatCard
+          title="Fees"
+          value={formatCurrency(transactionStats.totalFees)}
+        />
       </View>
       <Text variant="titleMedium" style={globalStyles.horizontalSpacing}>
         Quick Actions
@@ -143,8 +142,6 @@ export const HomeScreen = () => {
         handleCheckBalance={handleCheckBalance}
         handlePayGoodService={() => handleOpenBottomSheet('PAY_GOOD_SERVICE')}
         handleSendMoney={() => handleOpenBottomSheet('SEND_MONEY')}
-        // currentCode={action}
-        // loading={loading}
       />
       <TransactionsList
         data={transactions}

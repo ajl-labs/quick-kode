@@ -1,20 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { NativeEventEmitter, NativeModules } from 'react-native';
-import {
-  extractMomoUSSDData,
-  MOMO_USSD_CODES,
-} from '../helpers/ussd.momo.helper';
+import { MOMO_USSD_CODES } from '../helpers/ussd.momo.helper';
 import { useDispatch } from 'react-redux';
-import { setMoMoBalance } from '../../store/features/momo/momo.slice';
-import { addHistoryEntry } from '../../store/features/history/history.slice';
 
 // Access the native USSD module and create an event emitter
 const { UssdModule } = NativeModules;
 const emitter = new NativeEventEmitter(UssdModule);
 
 export const useUSSDEvent = () => {
-  const dispatch = useDispatch();
-
   // State for current USSD message and loading/error flags
   const [currentMessage, setCurrentMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -37,29 +30,29 @@ export const useUSSDEvent = () => {
   };
 
   // Helper: Dispatch parsed USSD data into Redux store
-  const handlePersistEventData = (
-    data: IMomoExtractedData,
-    eventName: keyof typeof MOMO_USSD_CODES,
-  ) => {
-    if (data.balance) {
-      dispatch(setMoMoBalance(data.balance));
-    }
-    switch (eventName) {
-      case 'SEND_MONEY':
-        if (data.send) {
-          dispatch(addHistoryEntry(data.send));
-        }
-        break;
-      case 'PAY_GOOD_SERVICE':
-        if (data.payGoods) {
-          dispatch(addHistoryEntry(data.payGoods));
-        }
-        break;
+  // const handlePersistEventData = (
+  //   data: IMomoExtractedData,
+  //   eventName: keyof typeof MOMO_USSD_CODES,
+  // ) => {
+  //   if (data.balance) {
+  //     dispatch(setMoMoBalance(data.balance));
+  //   }
+  //   switch (eventName) {
+  //     case 'SEND_MONEY':
+  //       if (data.send) {
+  //         dispatch(addHistoryEntry(data.send));
+  //       }
+  //       break;
+  //     case 'PAY_GOOD_SERVICE':
+  //       if (data.payGoods) {
+  //         dispatch(addHistoryEntry(data.payGoods));
+  //       }
+  //       break;
 
-      default:
-        break;
-    }
-  };
+  //     default:
+  //       break;
+  //   }
+  // };
 
   // Handle incoming USSD responses
   const handleUSSDResponse = useCallback(
@@ -103,16 +96,16 @@ export const useUSSDEvent = () => {
   }, [handleUSSDResponse]);
 
   // When current message changes, extract and persist USSD data
-  useEffect(() => {
-    if (currentActionName && currentMessage) {
-      const extractedData = extractMomoUSSDData(
-        currentMessage,
-        prevMessageRef.current,
-        currentActionName,
-      );
-      handlePersistEventData(extractedData, currentActionName);
-    }
-  }, [currentMessage, currentActionName]);
+  // useEffect(() => {
+  //   if (currentActionName && currentMessage) {
+  //     const extractedData = extractMomoUSSDData(
+  //       currentMessage,
+  //       prevMessageRef.current,
+  //       currentActionName,
+  //     );
+  //     handlePersistEventData(extractedData, currentActionName);
+  //   }
+  // }, [currentMessage, currentActionName]);
 
   return {
     currentMessage,
