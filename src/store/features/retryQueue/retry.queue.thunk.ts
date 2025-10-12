@@ -7,9 +7,11 @@ export const retryPostTransactions = createAsyncThunk(
   'retryQueue/retryPostTransactions',
   async (_, { getState, dispatch }) => {
     try {
+      console.log('Retrying post transactions...');
       const postTransactionRequests = Object.values(
         (getState() as RootState).retryQueue.postTransactionsRequests || {},
       ).filter(item => item.attempts < 5);
+      console.log(postTransactionRequests);
       if (postTransactionRequests.length < 1) return;
 
       await Promise.allSettled(

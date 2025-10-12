@@ -103,7 +103,7 @@ export const updateTransactionData = createAsyncThunk(
       record: IDataBaseRecord<ITransaction>;
       payload: Partial<ITransaction>;
     },
-    { getState, rejectWithValue },
+    { getState, dispatch, rejectWithValue },
   ) => {
     try {
       const { webhookAuth, webhooks } = (getState() as RootState).settings;
@@ -117,7 +117,12 @@ export const updateTransactionData = createAsyncThunk(
       return responseData;
     } catch (error) {
       if (isAxiosError(error)) {
-        console.log(error.response);
+        dispatch(
+          markWebhookAsFailed({
+            key: WEBHOOK_ACTIONS_KEY.UPDATE_TRANSACTION,
+            failed: true,
+          }),
+        );
       }
       showAndroidToast('Failed to update transaction data to webhook.', 'LONG');
       return rejectWithValue('Failed to update transaction data to webhook.');
