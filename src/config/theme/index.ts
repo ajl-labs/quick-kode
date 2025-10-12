@@ -27,7 +27,7 @@ export const lightTheme: MD3Theme = {
   ...MD3LightTheme,
   colors: {
     ...MD3LightTheme.colors,
-    primary: 'rgb(118, 74, 188)', //  purple for primary actions
+    primary: '#764abc', //  purple for primary actions
   },
   fonts: responsiveFonts,
   roundness: moderateScale(4),

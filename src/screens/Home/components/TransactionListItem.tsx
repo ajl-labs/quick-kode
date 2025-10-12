@@ -10,6 +10,7 @@ import {
   TransactionCategory,
   TransactionType,
 } from '../../../common/constants/enum';
+import { moderateScale } from 'react-native-size-matters';
 
 interface TransactionListItemProps {
   type: ITransaction['type'];
@@ -40,6 +41,9 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
     default: 'ArrowTopRight',
   };
 
+  const iconBackground = `${theme.colors.primary}20`;
+  const iconColor = theme.colors.primary;
+
   const renderIcon = (props: ItemExtraComponentProps) => {
     let iconName = type === 'DEBIT' ? iconNames.DEBIT : iconNames.CREDIT;
     if (iconType && iconNames[iconType]) {
@@ -50,14 +54,13 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
         <View
           style={[
             styles.iconContainer,
-
             {
-              backgroundColor: theme.colors.primaryContainer,
+              backgroundColor: iconBackground,
               borderRadius: theme.roundness,
             },
           ]}
         >
-          <Icon name={iconName} color={props.color} size={28} />
+          <Icon name={iconName} color={iconColor} size={28} />
         </View>
       );
     }
@@ -70,7 +73,19 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
         <View style={[styles.rightContentContainer]}>
           {rightUpText && <Text variant="bodySmall">{rightUpText}</Text>}
           {rightBottomText && (
-            <Badge selectionColor={props.color} size={20}>
+            <Badge
+              size={20}
+              theme={{
+                colors: {
+                  error: iconBackground,
+                  onError: iconColor,
+                },
+              }}
+              style={{
+                borderRadius: theme.roundness / 2,
+                fontSize: moderateScale(8),
+              }}
+            >
               {rightBottomText}
             </Badge>
           )}

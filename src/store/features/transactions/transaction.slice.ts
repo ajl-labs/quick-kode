@@ -56,7 +56,18 @@ export default reducer;
 
 export const selectAllTransactions = createSelector(
   (state: RootState) => state.transactions.transactions,
-  transactions => Object.values(transactions),
+  transactions =>
+    Object.values(transactions).sort((a, b) => {
+      if (a.completed_at && b.completed_at) {
+        return (
+          new Date(b.completed_at).getTime() -
+          new Date(a.completed_at).getTime()
+        );
+      }
+      return (
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    }),
 );
 
 export const selectRecentTransactions = createSelector(

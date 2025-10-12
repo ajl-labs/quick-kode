@@ -22,7 +22,6 @@ import { ThemeSpacings } from '../../../config/theme';
 import { NumberInput } from '../Input/NumberInput';
 import { CheckBox } from '../CheckBox';
 import globalStyles from '../../styles/global.styles';
-import { moderateScale } from 'react-native-size-matters';
 
 const styles = StyleSheet.create({
   container: {
@@ -59,6 +58,7 @@ interface FromInputProps extends TextInputProps {
   leftIcon?: IconProps['name'];
   errorMessage?: string;
   secret?: boolean;
+  isNumberInput?: boolean;
 }
 
 export const FormInput: React.FC<FromInputProps> = ({
@@ -67,14 +67,13 @@ export const FormInput: React.FC<FromInputProps> = ({
   onRightIconPress,
   onLeftIconPress,
   errorMessage,
-  keyboardType,
+  isNumberInput,
   secret = false,
   ...props
 }) => {
   const [secureTextEntry, setSecureTextEntry] = useState(secret);
   const theme = useTheme();
-  const InputComponent =
-    keyboardType === 'number-pad' ? NumberInput : TextInput;
+  const InputComponent = isNumberInput ? NumberInput : TextInput;
 
   const renderRightIcon = (props: any) => {
     if (rightIcon) {
@@ -90,7 +89,6 @@ export const FormInput: React.FC<FromInputProps> = ({
   return (
     <View style={styles.inputContainer}>
       <InputComponent
-        keyboardType={keyboardType}
         mode="outlined"
         left={
           leftIcon && (

@@ -19,10 +19,10 @@ export const postTransactionData = createAsyncThunk(
     transactionData: ITransactionPostPayload,
     { getState, dispatch, rejectWithValue },
   ) => {
-    console.log('Posting transaction data:', transactionData.messageId);
     try {
       const { webhookAuth, webhooks } = (getState() as RootState).settings;
       const { url } = webhooks[WEBHOOK_ACTIONS_KEY.POST_TRANSACTION] || {};
+      console.log('Posting transaction data to webhook...');
       if (!url) return;
       const { data } = await axios.post(
         url.trim(),
@@ -40,6 +40,7 @@ export const postTransactionData = createAsyncThunk(
       );
       return data;
     } catch (error) {
+      console.log(error);
       const axiosError = isAxiosError(error);
       const errorMessage = axiosError
         ? error.response?.data?.message
@@ -54,13 +55,14 @@ export const postTransactionData = createAsyncThunk(
         return rejectWithValue('You are sending none transaction message !!');
       }
 
-      if (axiosError && error.response?.status !== 500)
+      if (axiosError && error.response?.status !== 500) {
         dispatch(
           markWebhookAsFailed({
             key: WEBHOOK_ACTIONS_KEY.POST_TRANSACTION,
             failed: true,
           }),
         );
+      }
       dispatch(
         addPostTransactionRequest({
           key: transactionData.messageId,

@@ -57,7 +57,7 @@ export const PayGoodsForm: React.FC<PayGoodsFormProps> = ({
   return (
     <Form.FormContainer>
       <Form.FormInput
-        keyboardType="number-pad"
+        keyboardType="numeric"
         mode="outlined"
         label={contactName.trim().slice(0, 15) ?? 'Payment Code'}
         style={styles.input}
@@ -79,6 +79,7 @@ export const PayGoodsForm: React.FC<PayGoodsFormProps> = ({
         onBlur={formik.handleBlur('amount')}
         error={formik.touched.amount && Boolean(formik.errors.amount)}
         errorMessage={formik.errors.amount}
+        isNumberInput
       />
       <Form.FormButton
         title="Pay Goods/Service"

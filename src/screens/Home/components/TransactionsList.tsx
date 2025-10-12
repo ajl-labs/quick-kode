@@ -89,10 +89,12 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
     }
 
     const extraProps = { rightUpText: '', rightBottomText: '' };
-    if (isToday(item.completed_at)) {
-      extraProps['rightUpText'] = formatRelativeTime(item.completed_at);
+    const transactionDate = item.completed_at || item.created_at;
+
+    if (isToday(transactionDate)) {
+      extraProps['rightUpText'] = formatRelativeTime(transactionDate);
     } else {
-      extraProps['rightUpText'] = formatDate(item.completed_at, 'DD/MM/YY');
+      extraProps['rightUpText'] = formatDate(transactionDate, 'DD/MM/YY');
     }
 
     if (item.label) {
@@ -143,7 +145,9 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
         dispatch(
           updateTransactionData({
             record: selectedTransaction,
-            payload: { label },
+            payload: {
+              label: selectedTransaction.label === label ? '' : label,
+            },
           }),
         );
     },

@@ -18,7 +18,6 @@ export const reverseFormatCurrency = (
   if (typeof originalValue === 'string') {
     // remove commas, spaces, currency symbols etc.
     const parsed = originalValue.replace(/[^0-9.-]+/g, '').trim();
-    console.log(Number(parsed));
     return parsed === '' ? 0 : Number(parsed);
   }
   return value;

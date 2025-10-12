@@ -128,6 +128,7 @@ export const SendMoneyForm: React.FC<SendMoneyFormProps> = ({
         onBlur={formik.handleBlur('amount')}
         error={formik.touched.amount && Boolean(formik.errors.amount)}
         errorMessage={formik.errors.amount}
+        isNumberInput
       />
       <Form.FormButton
         title="Send Money"
