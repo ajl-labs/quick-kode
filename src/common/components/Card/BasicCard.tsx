@@ -1,50 +1,43 @@
-import { StyleProp, StyleSheet, ViewStyle } from 'react-native';
-import { Card, CardProps, useTheme } from 'react-native-paper';
-import { ThemeSpacings } from '../../../config/theme';
+import { StyleSheet } from 'react-native';
+import { CardProps, Surface, SurfaceProps, useTheme } from 'react-native-paper';
 import React from 'react';
+import globalStyles from '../../styles/global.styles';
 
 const styles = StyleSheet.create({
-  container: {},
   content: {
-    paddingHorizontal: ThemeSpacings.md,
-    paddingVertical: ThemeSpacings.md,
-    gap: ThemeSpacings.sm,
+    ...globalStyles.spacingSm,
+    flexGrow: 1,
   },
 });
 
-interface BasicCardProps {
+interface BasicCardProps extends Partial<SurfaceProps> {
   children?: React.ReactNode;
-  roundness?: number;
-  contentStyle?: StyleProp<ViewStyle>;
   style?: CardProps['style'];
-  outlineColor?: string;
+  roundness?: number;
 }
 export const BasicCard: React.FC<BasicCardProps> = ({
   children,
-  roundness,
-  contentStyle,
   style,
-  outlineColor,
+  roundness = 1,
+  ...props
 }) => {
   const theme = useTheme();
   return (
-    <Card
-      style={[styles.container, style]}
-      contentStyle={[
+    <Surface
+      elevation={0}
+      {...props}
+      style={[
+        {
+          borderColor: theme.colors.outline,
+          borderWidth: StyleSheet.hairlineWidth * 2,
+          backgroundColor: theme.colors.surface,
+          borderRadius: theme.roundness * roundness,
+        },
         styles.content,
-        // {
-        //   backgroundColor: 'rgba(0, 0, 0, 0)',
-        //   borderRadius: roundness || theme.roundness,
-        // },
-        contentStyle,
+        style,
       ]}
-      mode="outlined"
-      theme={{
-        roundness: roundness || theme.roundness,
-        colors: { outline: outlineColor || theme.colors.outline },
-      }}
     >
       {children}
-    </Card>
+    </Surface>
   );
 };

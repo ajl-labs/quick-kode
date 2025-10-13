@@ -8,7 +8,6 @@ export const screenContainerStyle = StyleSheet.create({
   container: {
     flex: 1,
     ...globalStyles.column,
-
     gap: ThemeSpacings.md,
   },
 });
@@ -24,7 +23,7 @@ export const Container: React.FC<ContainerProps> = ({ children, style }) => {
       style={[
         screenContainerStyle.container,
         globalStyles.verticalSpacing,
-        globalStyles.horizontalSpacing,
+        globalStyles.horizontalSpacingSm,
         { backgroundColor: theme.colors.background },
         style, // Allow additional styles to be passed in
       ]}

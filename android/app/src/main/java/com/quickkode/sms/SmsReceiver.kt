@@ -48,10 +48,13 @@ class SmsReceiver : BroadcastReceiver() {
             val messageId = "${sender}_${timestamp}_${message.hashCode()}"
             
             // Check if sender or service center address matches "M-Money"
+            // For development (emulator), also check for a 650 555 1212 number
             val isMMoney = listOf(sender, displayOriginatingAddress)
-                .any { it?.lowercase()?.contains("m-money".lowercase()) == true }
+                .any { it?.lowercase()?.contains("m-money".lowercase()) == true || it == "6505551212" }
+            // Check if it is a transaction message (contains "RWF")
+            val isTransactionMessage = message.lowercase().contains("rwf")
 
-            if (processedMessages.contains(messageId) || !isMMoney) {
+            if (processedMessages.contains(messageId) || !isMMoney || !isTransactionMessage) {
                 Log.d("SmsReceiver", "Event stopped: Duplicate or M-Money message")
                 return
             }

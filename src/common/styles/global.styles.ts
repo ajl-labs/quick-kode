@@ -42,12 +42,23 @@ export default StyleSheet.create({
     padding: ThemeSpacings.md,
     paddingBottom: ThemeSpacings.lg,
   },
+  flatListContentSm: {
+    gap: ThemeSpacings.sm,
+    paddingBottom: ThemeSpacings.lg,
+  },
+  spacing: {
+    padding: ThemeSpacings.md,
+  },
+  spacingSm: { padding: ThemeSpacings.sm },
   horizontalSpacing: {
     paddingHorizontal: ThemeSpacings.md,
   },
+  horizontalSpacingSm: { paddingHorizontal: ThemeSpacings.sm },
+
   verticalSpacing: {
     paddingVertical: ThemeSpacings.md,
   },
+  verticalSpacingSm: { paddingVertical: ThemeSpacings.sm },
   noSpacing: {
     paddingVertical: 0,
     paddingHorizontal: 0,

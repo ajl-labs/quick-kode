@@ -7,7 +7,7 @@ import {
   Text,
   useTheme,
 } from 'react-native-paper';
-import { FlatList, TouchableOpacity, View } from 'react-native';
+import { FlatList, FlatListProps, TouchableOpacity, View } from 'react-native';
 import globalStyles from '../../../common/styles/global.styles';
 import { TransactionListItem } from './TransactionListItem';
 
@@ -29,15 +29,19 @@ import { updateTransactionData } from '../../../store/features/transactions/tran
 import { AppDispatch } from '../../../store';
 import { extractTransactionSummary } from '../../../common/helpers/transaction.helper';
 
-interface TransactionsListProps {
+interface TransactionsListProps
+  extends Partial<FlatListProps<IDataBaseRecord<ITransaction>>> {
   data: IDataBaseRecord<ITransaction>[];
   onViewAllPress?: () => void;
   title?: string;
+  expanded?: boolean;
 }
 export const TransactionsList: React.FC<TransactionsListProps> = ({
   data,
   onViewAllPress,
   title,
+  expanded,
+  ...props
 }) => {
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
@@ -76,7 +80,8 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
         <TransactionListItem
           type={item.type}
           title={formatCurrency(item.amount)}
-          description={extractTransactionSummary(item)}
+          summary={extractTransactionSummary(item)}
+          {...(expanded ? { description: item.message } : {})}
           {...extraProps}
         />
       </TouchableOpacity>
@@ -124,8 +129,9 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
         data={data}
         keyExtractor={item => item.id}
         renderItem={renderTransactionItem}
-        contentContainerStyle={[globalStyles.flatListContent, { gap: 0 }]}
+        contentContainerStyle={[globalStyles.flatListContentSm, { gap: 0 }]}
         ListHeaderComponent={renderHeader}
+        {...props}
       />
       <Portal>
         <Dialog

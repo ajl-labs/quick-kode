@@ -15,10 +15,11 @@ import { moderateScale } from 'react-native-size-matters';
 interface TransactionListItemProps {
   type: ITransaction['type'];
   title: string;
-  description: string;
+  summary: string;
   rightUpText?: string;
   rightBottomText?: string;
   iconType?: TransactionCategory | TransactionType;
+  description?: string;
 }
 
 type ItemExtraComponentProps = { color: string; style?: Style | undefined };
@@ -26,6 +27,7 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
   type,
   title,
   description,
+  summary,
   rightUpText,
   rightBottomText,
   iconType,
@@ -57,6 +59,7 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
             {
               backgroundColor: iconBackground,
               borderRadius: theme.roundness,
+              ...(description && summary ? { alignSelf: 'flex-start' } : {}),
             },
           ]}
         >
@@ -67,7 +70,7 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
     return null;
   };
 
-  const renderRightContent = (props: ItemExtraComponentProps) => {
+  const renderRightContent = () => {
     if (rightUpText || rightBottomText) {
       return (
         <View style={[styles.rightContentContainer]}>
@@ -98,9 +101,18 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
     <List.Item
       title={<Text variant="titleSmall">{title}</Text>}
       description={props => (
-        <Text variant="bodySmall" style={{ color: props.color }}>
-          {description}
-        </Text>
+        <View style={[globalStyles.column, globalStyles.gapSm]}>
+          {summary && (
+            <Text variant="bodySmall" style={{ color: props.color }}>
+              {summary}
+            </Text>
+          )}
+          {description && (
+            <Text variant="bodySmall" style={{ fontSize: moderateScale(10) }}>
+              {description}
+            </Text>
+          )}
+        </View>
       )}
       left={renderIcon}
       right={renderRightContent}
@@ -112,7 +124,7 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
 
 const styles = StyleSheet.create({
   iconContainer: {
-    padding: 6,
+    padding: moderateScale(4),
     ...globalStyles.centered,
   },
   containerStyle: {

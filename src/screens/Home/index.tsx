@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Container } from '../../common/Container';
-import { Text } from 'react-native-paper';
+import { Text, Button } from 'react-native-paper';
 import { Alert, StyleSheet, View } from 'react-native';
 import globalStyles from '../../common/styles/global.styles';
 import { ThemeSpacings } from '../../config/theme';
@@ -29,16 +29,13 @@ const styles = StyleSheet.create({
     ...globalStyles.row,
     gap: ThemeSpacings.md,
     flexWrap: 'wrap',
-    ...globalStyles.horizontalSpacing,
   },
   statSection: {
     ...globalStyles.row,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
     flexWrap: 'wrap',
-    ...globalStyles.horizontalSpacing,
-    marginTop: ThemeSpacings.md,
+    rowGap: ThemeSpacings.sm,
+    columnGap: ThemeSpacings.sm,
+    ...globalStyles.spacingSm,
   },
 });
 
@@ -133,22 +130,46 @@ export const HomeScreen = () => {
           value={formatCurrency(transactionStats.totalFees)}
         />
       </View>
-      <Text variant="titleMedium" style={globalStyles.horizontalSpacing}>
-        Quick Actions
-      </Text>
-      <HomeQuickActions
-        style={styles.quickActionContainer}
-        handleBuyAirtime={handleBuyAirtime}
-        handleCheckBalance={handleCheckBalance}
-        handlePayGoodService={() => handleOpenBottomSheet('PAY_GOOD_SERVICE')}
-        handleSendMoney={() => handleOpenBottomSheet('SEND_MONEY')}
-      />
       <TransactionsList
         data={transactions}
         onViewAllPress={() =>
           navigation.navigate(HomeStackScreens.AllTransactions)
         }
         title="Recent Transactions"
+        expanded={false}
+        ListHeaderComponent={
+          <View
+            style={[
+              globalStyles.column,
+              globalStyles.gapSm,
+              globalStyles.fullWidth,
+            ]}
+          >
+            <Text variant="titleMedium">Quick Actions</Text>
+            <HomeQuickActions
+              style={styles.quickActionContainer}
+              handleBuyAirtime={handleBuyAirtime}
+              handleCheckBalance={handleCheckBalance}
+              handlePayGoodService={() =>
+                handleOpenBottomSheet('PAY_GOOD_SERVICE')
+              }
+              handleSendMoney={() => handleOpenBottomSheet('SEND_MONEY')}
+            />
+            <View style={[globalStyles.spacedRow, globalStyles.fullWidth]}>
+              <Text variant="titleMedium">Recent Transactions</Text>
+              <Button
+                mode="text"
+                style={globalStyles.horizontalSpacing}
+                onPress={() =>
+                  navigation.navigate(HomeStackScreens.AllTransactions)
+                }
+              >
+                View All
+              </Button>
+            </View>
+          </View>
+        }
+        style={[globalStyles.horizontalSpacingSm]}
       />
       <CustomBottomSheet ref={sheetRef}>
         {renderBottomSheetContent}
