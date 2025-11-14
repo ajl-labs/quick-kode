@@ -67,4 +67,8 @@ export default StyleSheet.create({
   gap: { gap: ThemeSpacings.md },
   gapSm: { gap: ThemeSpacings.sm },
   noRadius: { borderRadius: 0 },
+  code: {
+    fontFamily: 'monospace',
+    fontStyle: 'italic',
+  },
 });
