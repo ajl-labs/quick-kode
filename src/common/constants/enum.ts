@@ -14,3 +14,11 @@ export enum TransactionCategory {
   DEPOSIT = 'deposit',
   OTHER = 'other',
 }
+
+export enum USSDHandlerFormInputTypes {
+  TEXT = 'text',
+  NUMBER = 'number',
+  CURRENCY = 'currency',
+  PHONE = 'phone',
+  SELECTOR = 'selector',
+}

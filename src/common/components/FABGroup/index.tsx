@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { FAB, FABGroupProps as FabProps, Portal } from 'react-native-paper';
+import {
+  FAB,
+  FABGroupProps as FabProps,
+  Portal,
+  useTheme,
+} from 'react-native-paper';
 import { Icon } from '../Icon';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 
@@ -14,6 +19,7 @@ export const FABGroup: React.FC<FABGroupProps> = ({
   style,
   visible = true,
 }) => {
+  const theme = useTheme();
   const [isOpen, setIsOpen] = React.useState(false);
   const onStateChange = ({ open }: { open: boolean }) => setIsOpen(open);
 
@@ -23,7 +29,9 @@ export const FABGroup: React.FC<FABGroupProps> = ({
         <FAB.Group
           open={isOpen}
           visible={visible}
-          icon={props => <Icon name="Add" {...props} />}
+          icon={props => (
+            <Icon name="Add" {...props} color={theme.colors.onPrimary} />
+          )}
           actions={options}
           onStateChange={onStateChange}
           onPress={() => {
@@ -32,9 +40,14 @@ export const FABGroup: React.FC<FABGroupProps> = ({
             }
           }}
           style={[
-            { bottom: verticalScale(40), right: moderateScale(0) },
+            {
+              bottom: verticalScale(40),
+              right: moderateScale(0),
+              position: 'absolute',
+            },
             style,
           ]}
+          fabStyle={{ backgroundColor: theme.colors.primary }}
         />
       </Portal>
     </>

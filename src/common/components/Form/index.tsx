@@ -59,6 +59,7 @@ interface FromInputProps extends TextInputProps {
   errorMessage?: string;
   secret?: boolean;
   isNumberInput?: boolean;
+  helperMessage?: string;
 }
 
 export const FormInput: React.FC<FromInputProps> = ({
@@ -69,6 +70,7 @@ export const FormInput: React.FC<FromInputProps> = ({
   errorMessage,
   isNumberInput,
   secret = false,
+  helperMessage,
   ...props
 }) => {
   const [secureTextEntry, setSecureTextEntry] = useState(secret);
@@ -85,7 +87,6 @@ export const FormInput: React.FC<FromInputProps> = ({
       );
     }
   };
-
   return (
     <View style={styles.inputContainer}>
       <InputComponent
@@ -113,8 +114,19 @@ export const FormInput: React.FC<FromInputProps> = ({
         {...props}
         secureTextEntry={secureTextEntry}
       />
-      {errorMessage?.trim() && (
-        <Text style={{ color: theme.colors.error }}>{errorMessage}</Text>
+      {errorMessage?.trim() && Boolean(props.error) && (
+        <Text
+          style={{
+            color: theme.colors.error,
+          }}
+        >
+          {errorMessage}
+        </Text>
+      )}
+      {helperMessage?.trim() && !Boolean(props.error) && (
+        <Text variant="labelSmall" style={{ fontWeight: '400' }}>
+          {helperMessage}
+        </Text>
       )}
     </View>
   );

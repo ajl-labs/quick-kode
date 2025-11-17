@@ -44,3 +44,21 @@ export const checkAccessibilityPermission = async () => {
     }
   }
 };
+
+export const extractUSSDFormVariable = (ussShortCodeConfig: string) => {
+  const regex = /\{\{([^}]+)\}\}/g;
+  const matches = [...(ussShortCodeConfig?.matchAll(regex) || [])];
+  return matches.map(match => match[1].trim());
+};
+
+export const formatCallableUSSDQuickCode = (
+  placeholderCode: string,
+  values: Record<string, string | number>,
+) => {
+  let formattedCode = placeholderCode;
+  Object.keys(values).forEach(key => {
+    const regex = new RegExp(`\\{{${key}\\}}`, 'g');
+    formattedCode = formattedCode.replace(regex, String(values[key]));
+  });
+  return formattedCode;
+};

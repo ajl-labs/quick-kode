@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Button,
   Divider,
@@ -6,6 +6,7 @@ import {
   Text,
   useTheme,
 } from 'react-native-paper';
+import { useIsFocused } from '@react-navigation/native';
 import { Alert, FlatList, TouchableOpacity, View } from 'react-native';
 import { Container } from '../../common/Container';
 import {
@@ -35,6 +36,7 @@ import webhookActionMap, {
 } from '../../common/constants/webhook.actions';
 
 export const WebhookSettings = () => {
+  const isFocused = useIsFocused();
   const webhooksList = useSelector(selectWebhooks);
   const webhooksAuth = useSelector(selectWebhookAuth);
   const bottomSheetRef = useRef<CustomBottomSheetHandles>(null);
@@ -96,24 +98,6 @@ export const WebhookSettings = () => {
 
   const deleteWebhookAlert = (key: WEBHOOK_ACTIONS_KEY) => {
     dispatch(removeWebhook({ key }));
-
-    // Alert.alert(
-    //   'Webhook Delete',
-    //   'Are you sure you want remove this webhook?',
-    //   [
-    //     {
-    //       text: 'Cancel',
-    //       onPress: () => console.log('Cancel Pressed'),
-    //       style: 'cancel',
-    //     },
-    //     {
-    //       text: 'OK',
-    //       onPress: () => {
-    //         dispatch(removeWebhook({ key }));
-    //       },
-    //     },
-    //   ],
-    // );
   };
 
   const renderWebhookItem = ({ item }: { item: IWebhookData }) => {
@@ -211,25 +195,7 @@ export const WebhookSettings = () => {
   );
 
   return (
-    <View style={[globalStyles.flex]}>
-      {webhooksList.length > 0 && (
-        <FABGroup
-          visible={!bottomSheetOpen}
-          options={[
-            {
-              icon: props => <Icon {...props} name="Webhook" />,
-              label: 'Add Webhook',
-              onPress: () => handleOpenSheet('webhook'),
-            },
-            {
-              icon: props => <Icon {...props} name="Settings" />,
-              label: 'Configure Webhook',
-              onPress: () => handleOpenSheet('webhook-auth'),
-            },
-          ]}
-        />
-      )}
-
+    <View style={[[globalStyles.flexGrow]]}>
       <FlatList
         ListHeaderComponent={renderListHeader}
         data={webhooksList}
@@ -251,6 +217,24 @@ export const WebhookSettings = () => {
           />
         )}
       </CustomBottomSheet>
+      {webhooksList.length > 0 && isFocused && (
+        <FABGroup
+          visible={!bottomSheetOpen}
+          options={[
+            {
+              icon: props => <Icon {...props} name="Webhook" />,
+              label: 'Add Webhook',
+              onPress: () => handleOpenSheet('webhook'),
+            },
+            {
+              icon: props => <Icon {...props} name="Settings" />,
+              label: 'Configure Webhook',
+              onPress: () => handleOpenSheet('webhook-auth'),
+            },
+          ]}
+          //style={{ backgroundColor: theme.colors.surface }}
+        />
+      )}
     </View>
   );
 };
