@@ -10,7 +10,8 @@
     "start": "react-native start",
     "test": "jest",
     "e2e:android": "./maestro/run-test.sh",
-    "build:android:prod": "ENVFILE=.env.production yarn react-native build-android --tasks assembleRelease"
+    "build:android:prod": "ENVFILE=.env.production yarn react-native build-android --tasks assembleRelease && cp android/app/build/outputs/apk/release/app-release.apk ./files/quick-kode-release.apk",
+    "adb:install:prod": "adb install -r ./files/quick-kode-release.apk"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "5.1.6",
