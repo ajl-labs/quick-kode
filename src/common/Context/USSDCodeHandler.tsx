@@ -3,16 +3,14 @@ import {
   CustomBottomSheet,
   CustomBottomSheetHandles,
 } from '../components/CustomBottomSheet';
-import { View } from 'react-native';
-import { Text } from 'react-native-paper';
 import { dialUSSD } from '../helpers';
 import { USSDHandlerForm } from '../components/Form/USSDHandlerForm';
 import { useDispatch } from 'react-redux';
 import { addUsedCount } from '../../store/features/ussdCode/ussd.code.slice';
 
 type ContextType = {
-  onClose: () => void;
-  onOpen: (codeConfig: IUSSDCodeData) => void;
+  closeUSSDHandlerForm: () => void;
+  openUSSSHandlerForm: (codeConfig: IUSSDCodeData) => void;
 };
 export const USSDCodeHandlerContext = createContext<ContextType | null>(null);
 
@@ -68,10 +66,16 @@ export const USSDCodeHandlerProvider = ({
   }, [currentCodeConfig]);
 
   return (
-    <USSDCodeHandlerContext.Provider value={{ onOpen: open, onClose: close }}>
+    <USSDCodeHandlerContext.Provider
+      value={{ openUSSSHandlerForm: open, closeUSSDHandlerForm: close }}
+    >
       {children}
       <CustomBottomSheet ref={bottomSheetRef}>
-        <USSDHandlerForm config={currentCodeConfig} onSubmit={handleSubmit} />
+        <USSDHandlerForm
+          config={currentCodeConfig}
+          onSubmit={handleSubmit}
+          onClose={close}
+        />
       </CustomBottomSheet>
     </USSDCodeHandlerContext.Provider>
   );

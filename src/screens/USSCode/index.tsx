@@ -10,10 +10,13 @@ import {
 import { Icon } from '../../common/components';
 import { NewCodeForm } from './components/NewCodeForm';
 import { Swipeable } from '../../common/components/Swipeable';
+import { useUSSDCodeHandler } from '../../common/hooks/useUSSDCodeHandler';
 
 export const USSDCodeScreen = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
+  const { openUSSSHandlerForm } = useUSSDCodeHandler();
+
   const USSDCodes = useSelector(selectAllUSSDCodes);
 
   const toogleFavorite = (code: string, isFavorite: boolean) =>
@@ -73,7 +76,7 @@ export const USSDCodeScreen = () => {
       >
         <List.Item
           title={item.description}
-          onPress={() => {}}
+          onPress={() => openUSSSHandlerForm(item)}
           onLongPress={() => {
             toogleFavorite(item.code, !Boolean(item.isFavorite));
           }}

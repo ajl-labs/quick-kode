@@ -8,15 +8,18 @@ import { formatCallableUSSDQuickCode, removeCountryCode } from '../../helpers';
 import { Formik, FormikProps } from 'formik';
 import * as Yup from 'yup';
 import { amountSchema } from '../../helpers/currency.helpers';
+import { IconProps } from 'react-native-paper/lib/typescript/components/MaterialCommunityIcon';
 
 interface USSDHandlerFormProps {
   config?: IUSSDCodeData;
   onSubmit: (formattedCode: string) => void;
+  onClose?: () => void;
 }
 
 export const USSDHandlerForm: React.FC<USSDHandlerFormProps> = ({
-  config: { code, variables = {} } = {},
+  config: { code, variables = {}, description, icon } = {},
   onSubmit,
+  onClose,
 }) => {
   const [labels, setLabels] = useState<Record<string, string>>({});
   const formikRef = useRef<FormikProps<any>>(null);
@@ -106,7 +109,14 @@ export const USSDHandlerForm: React.FC<USSDHandlerFormProps> = ({
       }}
       validationSchema={validationSchema}
     >
-      {({ handleChange, handleBlur, values, errors, handleSubmit }) => (
+      {({
+        handleChange,
+        handleBlur,
+        values,
+        errors,
+        handleSubmit,
+        touched,
+      }) => (
         <Form.FormContainer>
           {Object.keys(variables).map((variableKey, index) => {
             let { type, label = startCase(variableKey) } =
@@ -138,7 +148,7 @@ export const USSDHandlerForm: React.FC<USSDHandlerFormProps> = ({
                 value={values[variableKey]}
                 onChangeText={handleChange(variableKey)}
                 onBlur={handleBlur(variableKey)}
-                error={Boolean(errors[variableKey] && values[variableKey])}
+                error={Boolean(errors[variableKey] && touched[variableKey])}
                 errorMessage={errors[variableKey] as string}
                 mode="outlined"
                 style={{ width: '100%' }}
@@ -147,10 +157,12 @@ export const USSDHandlerForm: React.FC<USSDHandlerFormProps> = ({
             );
           })}
           <Form.FormButton
-            title="Submit"
+            title={description ?? 'Send'}
+            iconName={(icon as IconProps['name']) ?? undefined}
             mode="contained"
             onPress={() => handleSubmit()}
           />
+          <Form.FormButton title="Cancel" mode="outlined" onPress={onClose} />
         </Form.FormContainer>
       )}
     </Formik>

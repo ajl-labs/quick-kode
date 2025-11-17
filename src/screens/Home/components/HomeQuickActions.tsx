@@ -18,7 +18,7 @@ export const HomeQuickActions: FC<HomeQuickActionsProps> = ({
   loading,
 }) => {
   const favoriteUSSDCodes = useSelector(selectFavoriteUSSDCodes);
-  const { onOpen } = useUSSDCodeHandler();
+  const { openUSSSHandlerForm } = useUSSDCodeHandler();
 
   return (
     <View style={style}>
@@ -26,7 +26,7 @@ export const HomeQuickActions: FC<HomeQuickActionsProps> = ({
         <QuickAction
           key={code.code}
           icon={(code.icon as IconProps['name']) || 'DialPad'}
-          onPress={() => onOpen(code)}
+          onPress={() => openUSSSHandlerForm(code)}
           loading={loading && currentCode === code.code}
           disabled={loading}
         >

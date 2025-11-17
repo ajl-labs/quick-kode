@@ -17,7 +17,6 @@ import {
 } from '../../store/features/transactions/transaction.slice';
 import { fetchTransactionStats } from '../../store/features/transactions/transaction.thunk';
 import { AppDispatch } from '../../store';
-import { USSDCodeHandlerProvider } from '../../common/Context/USSDCodeHandler';
 
 const styles = StyleSheet.create({
   quickActionContainer: {
@@ -46,52 +45,50 @@ export const HomeScreen = () => {
   }, []);
 
   return (
-    <USSDCodeHandlerProvider>
-      <Container style={globalStyles.noSpacing}>
-        <View style={styles.statSection}>
-          <StatCard
-            title="Balance"
-            value={formatCurrency(transactionStats.balance)}
-          />
-          <StatCard
-            title="Fees"
-            value={formatCurrency(transactionStats.totalFees)}
-          />
-        </View>
-        <TransactionsList
-          data={transactions}
-          onViewAllPress={() =>
-            navigation.navigate(HomeStackScreens.AllTransactions)
-          }
-          title="Recent Transactions"
-          expanded={false}
-          ListHeaderComponent={
-            <View
-              style={[
-                globalStyles.column,
-                globalStyles.gapSm,
-                globalStyles.fullWidth,
-              ]}
-            >
-              <Text variant="titleMedium">Quick Actions</Text>
-              <HomeQuickActions style={styles.quickActionContainer} />
-              <View style={[globalStyles.spacedRow, globalStyles.fullWidth]}>
-                <Text variant="titleMedium">Recent Transactions</Text>
-                <Button
-                  mode="text"
-                  style={globalStyles.horizontalSpacing}
-                  onPress={() =>
-                    navigation.navigate(HomeStackScreens.AllTransactions)
-                  }
-                >
-                  View All
-                </Button>
-              </View>
-            </View>
-          }
-          style={[globalStyles.horizontalSpacingSm]}
+    <Container style={globalStyles.noSpacing}>
+      <View style={styles.statSection}>
+        <StatCard
+          title="Balance"
+          value={formatCurrency(transactionStats.balance)}
         />
-      </Container>
-    </USSDCodeHandlerProvider>
+        <StatCard
+          title="Fees"
+          value={formatCurrency(transactionStats.totalFees)}
+        />
+      </View>
+      <TransactionsList
+        data={transactions}
+        onViewAllPress={() =>
+          navigation.navigate(HomeStackScreens.AllTransactions)
+        }
+        title="Recent Transactions"
+        expanded={false}
+        ListHeaderComponent={
+          <View
+            style={[
+              globalStyles.column,
+              globalStyles.gapSm,
+              globalStyles.fullWidth,
+            ]}
+          >
+            <Text variant="titleMedium">Quick Actions</Text>
+            <HomeQuickActions style={styles.quickActionContainer} />
+            <View style={[globalStyles.spacedRow, globalStyles.fullWidth]}>
+              <Text variant="titleMedium">Recent Transactions</Text>
+              <Button
+                mode="text"
+                style={globalStyles.horizontalSpacing}
+                onPress={() =>
+                  navigation.navigate(HomeStackScreens.AllTransactions)
+                }
+              >
+                View All
+              </Button>
+            </View>
+          </View>
+        }
+        style={[globalStyles.horizontalSpacingSm]}
+      />
+    </Container>
   );
 };

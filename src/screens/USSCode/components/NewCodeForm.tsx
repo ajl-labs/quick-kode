@@ -83,7 +83,7 @@ export const NewCodeForm = () => {
       <CustomBottomSheet ref={bottomSheetRef} onOpenChange={setIsFormOpen}>
         <Form.FormContainer>
           <Form.FormInput
-            label="Description"
+            label="Title"
             onChangeText={form.handleChange('description')}
             onBlur={form.handleBlur('description')}
             value={form.values.description}
