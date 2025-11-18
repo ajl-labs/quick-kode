@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-import { SwipeableProps } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureDetector,
+  SwipeableProps,
+} from 'react-native-gesture-handler';
+import type { Swipeable as GHSwipeable } from 'react-native-gesture-handler';
 import Reanimated, {
   SharedValue,
   useAnimatedStyle,
@@ -13,6 +18,11 @@ interface RightActionProps {
   rightAction?: React.ReactNode;
 }
 
+interface CustomSwipeableHandles {
+  close: () => void;
+}
+
+export type { Swipeable as GHSwipeable } from 'react-native-gesture-handler';
 const RightAction: React.FC<RightActionProps> = ({
   progress,
   drag,
@@ -37,29 +47,37 @@ interface ISwipeableProps extends Partial<SwipeableProps> {
   style?: StyleProp<ViewStyle>;
 }
 
-export const Swipeable: React.FC<ISwipeableProps> = ({
-  children,
-  rightAction,
-  style,
-}) => {
-  return (
-    <ReanimatedSwipeable
-      containerStyle={[styles.swipeable, style]}
-      friction={3}
-      enableTrackpadTwoFingerGesture
-      rightThreshold={40}
-      renderRightActions={(progress, transition) => (
-        <RightAction
-          progress={progress}
-          drag={transition}
-          rightAction={rightAction}
-        />
-      )}
-    >
-      {children}
-    </ReanimatedSwipeable>
-  );
-};
+export const Swipeable = forwardRef<CustomSwipeableHandles, ISwipeableProps>(
+  ({ children, rightAction, style }, ref) => {
+    const internalRef = useRef<GHSwipeable>(null);
+    const panGesture = Gesture.Pan();
+    useImperativeHandle(ref, () => ({
+      close: () => internalRef.current?.close(),
+    }));
+
+    return (
+      <GestureDetector gesture={panGesture}>
+        <ReanimatedSwipeable
+          simultaneousWithExternalGesture={panGesture}
+          ref={internalRef}
+          containerStyle={[styles.swipeable, style]}
+          friction={3}
+          enableTrackpadTwoFingerGesture
+          rightThreshold={40}
+          renderRightActions={(progress, transition) => (
+            <RightAction
+              progress={progress}
+              drag={transition}
+              rightAction={rightAction}
+            />
+          )}
+        >
+          {children}
+        </ReanimatedSwipeable>
+      </GestureDetector>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   rightAction: {

@@ -1,5 +1,6 @@
 import { RootState } from '.';
 import { omit } from 'lodash';
+import { DEFAULT_USSD_CODE_CONFIG } from '../common/constants/default.state';
 
 // define your migrations
 const storeMigration = {
@@ -28,6 +29,15 @@ const storeMigration = {
       transactions: {
         ...state.transactions,
         stats: {},
+      },
+    };
+  },
+  4: (state: RootState) => {
+    return {
+      ...state,
+      ussdCode: {
+        ...state.ussdCode,
+        codes: DEFAULT_USSD_CODE_CONFIG,
       },
     };
   },

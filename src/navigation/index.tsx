@@ -2,6 +2,7 @@ import * as React from 'react';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { HomeStack } from './HomeStack';
 import { MD3Theme } from 'react-native-paper';
+import { USSDCodeHandlerProvider } from '../common/Context/USSDCodeHandler';
 
 interface NavigationProps {
   theme: MD3Theme;
@@ -23,7 +24,9 @@ export const Navigation: React.FC<NavigationProps> = ({ theme }) => {
         },
       }}
     >
-      <HomeStack />
+      <USSDCodeHandlerProvider>
+        <HomeStack />
+      </USSDCodeHandlerProvider>
     </NavigationContainer>
   );
 };

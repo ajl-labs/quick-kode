@@ -9,6 +9,7 @@ import android.util.Log
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.facebook.react.bridge.WritableNativeMap
+import com.facebook.react.HeadlessJsTaskService
 
 class SmsReceiver : BroadcastReceiver() {
 
@@ -19,11 +20,17 @@ class SmsReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action != "android.provider.Telephony.SMS_RECEIVED") return
+        if (context == null) return
 
         try {
-           val bundle: Bundle? = intent.extras
+            val bundle: Bundle? = intent.extras
             val pdus = bundle?.get("pdus") as? Array<*>
-       
+
+            if (pdus == null) {
+                Log.e("SmsReceiver", "No PDUs found")
+                return
+            }
+
             var sender: String? = null
             var displayOriginatingAddress: String? = null
             var timestamp: Long? = null
@@ -35,18 +42,19 @@ class SmsReceiver : BroadcastReceiver() {
                 if (sender == null) {
                     sender = sms.originatingAddress
                 }
-                if( timestamp == null) {
+                if (timestamp == null) {
                     timestamp = sms.timestampMillis
                 }
-                if( displayOriginatingAddress == null) {
+                if (displayOriginatingAddress == null) {
                     displayOriginatingAddress = sms.displayOriginatingAddress
                 }
                 message += sms.displayMessageBody
             }
-            
+
+            val safeSender = sender ?: "unknown"
+            val safeTimestamp = timestamp ?: System.currentTimeMillis()
             // Generate a unique ID for this message to prevent duplicates
-            val messageId = "${sender}_${timestamp}_${message.hashCode()}"
-            
+            var messageId = "${safeSender}_${safeTimestamp}_${message.hashCode()}"
             // Check if sender or service center address matches "M-Money"
             // For development (emulator), also check for a 650 555 1212 number
             val isMMoney = listOf(sender, displayOriginatingAddress)
@@ -62,17 +70,17 @@ class SmsReceiver : BroadcastReceiver() {
             // Add to processed messages
             processedMessages.add(messageId)
 
-            val params = WritableNativeMap().apply {
-                putString("message", message)
-                putString("sender", sender)
-                putString("timestamp", timestamp.toString())
-                putString("address", displayOriginatingAddress)
-                putString("messageId", messageId)
+            val serviceIntent = Intent(context, SmsHeadlessService::class.java).apply {
+                putExtra("message", message)
+                putExtra("sender", sender)
+                putExtra("timestamp", timestamp)
+                putExtra("messageId", messageId)
             }
 
-            reactContext?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-                ?.emit("onSmsReceived", params)
-            
+
+            context.startService(serviceIntent)
+            HeadlessJsTaskService.acquireWakeLockNow(context)
+
         } catch (e: Exception) {
             Log.e("SmsReceiver", "Error receiving SMS", e)
         }

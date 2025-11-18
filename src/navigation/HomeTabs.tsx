@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { HomeScreen, HistoryScreen } from '../screens';
+import { HomeScreen, USSDCodeScreen } from '../screens';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon } from '../common/components';
 import { ThemeSpacings } from '../config/theme';
@@ -32,12 +32,12 @@ export const HomeTabs = () => {
 
       <Tab.Screen
         name={HomeTabScreens.History}
-        component={HistoryScreen}
+        component={USSDCodeScreen}
         options={{
-          tabBarLabel: 'History',
-          headerTitle: 'USSD History',
+          tabBarLabel: 'Codes',
+          headerTitle: 'USSD Code',
           tabBarIcon: ({ color, size }) => (
-            <Icon name="History" color={color} size={size} />
+            <Icon name="Hash" color={color} size={size} />
           ),
         }}
       />

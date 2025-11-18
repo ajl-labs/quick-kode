@@ -4,7 +4,6 @@ import {
   NativeEventEmitter,
   PermissionsAndroid,
   Platform,
-  Alert,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store';
@@ -59,6 +58,7 @@ export const useSMSListener = () => {
       async (event: Record<string, string>) => {
         try {
           setMessage(event.message);
+          console.log('message recieved', event.message);
           await dispatch(
             postTransactionData({
               message: event.message,
@@ -81,6 +81,7 @@ export const useSMSListener = () => {
       subscription.remove();
     };
   }, []);
+
   return {
     message,
   };

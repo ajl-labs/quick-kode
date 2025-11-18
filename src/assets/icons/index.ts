@@ -32,6 +32,10 @@ import Delete from './delete.svg';
 import AddNote from './add-note.svg';
 import Download from './download.svg';
 import Upload from './upload.svg';
+import Hash from './hash.svg';
+import DialPad from './dial-pad.svg';
+import AddBookmark from './add-bookmark.svg';
+import Bookmark from './bookmark.svg';
 
 export const icons = {
   ArrowTopRight,
@@ -67,4 +71,8 @@ export const icons = {
   AddNote,
   Download,
   Upload,
+  Hash,
+  DialPad,
+  AddBookmark,
+  Bookmark,
 };

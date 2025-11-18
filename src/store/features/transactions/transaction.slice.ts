@@ -35,6 +35,18 @@ const historySlice = createSlice({
         ...action.payload,
       };
     },
+    updateTransactionState(
+      state,
+      action: { payload: Partial<IDataBaseRecord<ITransaction>>; type: string },
+    ) {
+      const { id, ...restOfPayload } = action.payload;
+      if (id && state.transactions[id]) {
+        state.transactions[id] = {
+          ...state.transactions[id],
+          ...restOfPayload,
+        };
+      }
+    },
   },
   extraReducers: builder => {
     builder
@@ -80,7 +92,7 @@ const historySlice = createSlice({
 
 const { actions, reducer } = historySlice;
 
-export const { setTransactionStats } = actions;
+export const { setTransactionStats, updateTransactionState } = actions;
 
 export default reducer;
 

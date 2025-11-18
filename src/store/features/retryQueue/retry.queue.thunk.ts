@@ -7,7 +7,6 @@ export const retryPostTransactions = createAsyncThunk(
   'retryQueue/retryPostTransactions',
   async (_, { getState, dispatch }) => {
     try {
-      console.log('Retrying post transactions...');
       const postTransactionRequests = Object.values(
         (getState() as RootState).retryQueue.postTransactionsRequests || {},
       ).filter(item => item.attempts < (__DEV__ ? 1 : 5)); // In dev mode, only try once to avoid spamming
