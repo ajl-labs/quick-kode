@@ -1,7 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { isAxiosError } from 'axios';
 import { RootState } from '../..';
-import { markWebhookAsFailed } from '../settings/settings.slice';
+import {
+  addTransactionLabel,
+  markWebhookAsFailed,
+} from '../settings/settings.slice';
 import { WEBHOOK_ACTIONS_KEY } from '../../../common/constants/webhook.actions';
 import {
   replaceUrlPlaceholders,
@@ -16,6 +19,7 @@ import {
   getPendingBackgroundTransactions,
   removePendingBackgroundTransaction,
 } from '../../../service/background.transaction';
+import { updateTransactionState } from './transaction.slice';
 
 export const postTransactionData = createAsyncThunk(
   'history/postTransactionData',
@@ -144,6 +148,12 @@ export const updateTransactionData = createAsyncThunk(
     { getState, dispatch, rejectWithValue },
   ) => {
     try {
+      dispatch(
+        updateTransactionState({
+          id: updateData.record.id,
+          ...updateData.payload,
+        } as Partial<IDataBaseRecord<ITransaction>>),
+      );
       const { webhookAuth, webhooks } = (getState() as RootState).settings;
       const { url } = webhooks[WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT] || {};
       if (!url) return;
