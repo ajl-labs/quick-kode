@@ -12,11 +12,15 @@ import {
   removePostTransactionRequest,
 } from '../retryQueue/retry.queue.slice';
 import { omit } from 'lodash';
+import {
+  getPendingBackgroundTransactions,
+  removePendingBackgroundTransaction,
+} from '../../../service/background.transaction';
 
 export const postTransactionData = createAsyncThunk(
   'history/postTransactionData',
   async (
-    transactionData: ITransactionPostPayload,
+    transactionData: ITransactionPostPayload & { isFromLocalStorage?: boolean },
     { getState, dispatch, rejectWithValue },
   ) => {
     try {
@@ -35,13 +39,17 @@ export const postTransactionData = createAsyncThunk(
         },
         { auth: webhookAuth },
       );
-      dispatch(
-        removePostTransactionRequest({ key: transactionData.messageId }),
-      );
-      dispatch(fetchTransactionStats());
+
+      // only fetch if not from local storage
+      if (!transactionData.isFromLocalStorage) {
+        dispatch(
+          removePostTransactionRequest({ key: transactionData.messageId }),
+        );
+        dispatch(fetchTransactionStats());
+      }
+
       return data;
     } catch (error) {
-      console.log(error);
       const axiosError = isAxiosError(error);
       const errorMessage = axiosError
         ? error.response?.data?.message
@@ -67,10 +75,37 @@ export const postTransactionData = createAsyncThunk(
       dispatch(
         addPostTransactionRequest({
           key: transactionData.messageId,
-          data: transactionData,
+          data: omit(transactionData, ['isFromLocalStorage']),
         }),
       );
+      // don't reject when failed for local storage
+      if (transactionData.isFromLocalStorage) return;
       return rejectWithValue(errorMessage);
+    }
+  },
+);
+
+export const postPendingTransactions = createAsyncThunk(
+  'transactions/postPendingTransactions',
+  async (_, { getState, dispatch }) => {
+    try {
+      const transactions = await getPendingBackgroundTransactions();
+      console.log(`pending transactions: ${Object.keys(transactions).length}`);
+      for (const [messageId, transactionData] of Object.entries(transactions)) {
+        await dispatch(
+          postTransactionData({ ...transactionData, isFromLocalStorage: true }),
+        ).unwrap();
+        await removePendingBackgroundTransaction(messageId);
+      }
+    } catch (error) {
+      if (isAxiosError(error)) {
+        console.log(error.response);
+      }
+      showAndroidToast(
+        'Failed to fetch transaction data from webhook.',
+        'LONG',
+      );
+      return;
     }
   },
 );

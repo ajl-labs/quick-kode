@@ -7,11 +7,14 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import SystemNavigationBar from 'react-native-system-navigation-bar';
-import { useSMSListener } from './common/hooks/useSMSListener';
 import { useDispatch } from 'react-redux';
-import { fetchTransactionData } from './store/features/transactions/transaction.thunk';
+import {
+  fetchTransactionData,
+  postPendingTransactions,
+} from './store/features/transactions/transaction.thunk';
 import { AppDispatch } from './store';
 import { retryPostTransactions } from './store/features/retryQueue/retry.queue.thunk';
+import { useAppInitialization } from './common/hooks/useAppInitialization';
 
 const styles = StyleSheet.create({
   container: {
@@ -20,14 +23,16 @@ const styles = StyleSheet.create({
 });
 
 export const AppRoot = () => {
-  useSMSListener();
+  useAppInitialization();
   const dispatch = useDispatch<AppDispatch>();
   const isDarkMode = useColorScheme() === 'dark';
 
   const theme = isDarkMode ? darkTheme : lightTheme;
+
   useEffect(() => {
-    dispatch(fetchTransactionData());
     dispatch(retryPostTransactions());
+    dispatch(postPendingTransactions());
+    dispatch(fetchTransactionData());
   }, [dispatch]);
 
   SystemNavigationBar.setNavigationColor(

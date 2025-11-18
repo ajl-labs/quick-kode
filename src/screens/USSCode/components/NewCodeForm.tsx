@@ -120,7 +120,7 @@ export const NewCodeForm = () => {
                 }))}
                 label={`${startCase(variable)} Input Type`}
                 placeholder="Select Variable Type"
-                value={form.values.variables[variable]?.type}
+                value={(form.values.variables as any)?.[variable]?.type}
                 onChangeText={value =>
                   form.setFieldValue(`variables.${variable}.type`, value)
                 }

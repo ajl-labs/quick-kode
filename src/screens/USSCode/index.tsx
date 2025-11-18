@@ -1,7 +1,14 @@
-import { Alert, FlatList, View } from 'react-native';
+import { useRef } from 'react';
+import {
+  Alert,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import globalStyles from '../../common/styles/global.styles';
-import { IconButton, List, useTheme } from 'react-native-paper';
+import { IconButton, useTheme, Text } from 'react-native-paper';
 import {
   removeCode,
   selectAllUSSDCodes,
@@ -9,34 +16,47 @@ import {
 } from '../../store/features/ussdCode/ussd.code.slice';
 import { Icon } from '../../common/components';
 import { NewCodeForm } from './components/NewCodeForm';
-import { Swipeable } from '../../common/components/Swipeable';
+import { Swipeable, GHSwipeable } from '../../common/components/Swipeable';
 import { useUSSDCodeHandler } from '../../common/hooks/useUSSDCodeHandler';
+import { moderateScale } from 'react-native-size-matters';
 
 export const USSDCodeScreen = () => {
+  const swipeableRef = useRef<GHSwipeable>(null);
   const dispatch = useDispatch();
   const theme = useTheme();
   const { openUSSSHandlerForm } = useUSSDCodeHandler();
 
   const USSDCodes = useSelector(selectAllUSSDCodes);
 
-  const toogleFavorite = (code: string, isFavorite: boolean) =>
-    Alert.alert(
-      'Add to Favorites',
-      'Do you want to add this code to your favorites?',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => {
-            console.log('canceled');
-          },
-          style: 'cancel',
+  const toogleFavorite = (codeConfig: IUSSDCodeData, isFavorite: boolean) => {
+    let title = 'Add to Favorites';
+    let message = `Do you want to add ${codeConfig.description} to your favorites?`;
+
+    if (isFavorite) {
+      title = 'Remove from Favorites';
+      message = `Do you want to remove ${codeConfig.description} from your favorites?`;
+    }
+
+    return Alert.alert(title, message, [
+      {
+        text: 'Cancel',
+        onPress: () => {
+          console.log('canceled');
         },
-        {
-          text: 'Confirm',
-          onPress: () => dispatch(toogleCodeFavorite({ code, isFavorite })),
-        },
-      ],
-    );
+        style: 'cancel',
+      },
+      {
+        text: 'Confirm',
+        onPress: () =>
+          dispatch(
+            toogleCodeFavorite({
+              code: codeConfig.code,
+              isFavorite: !isFavorite,
+            }),
+          ),
+      },
+    ]);
+  };
 
   const deleteCodeAlert = (code: string) => {
     Alert.alert(
@@ -45,10 +65,10 @@ export const USSDCodeScreen = () => {
       [
         {
           text: 'Cancel',
-          onPress: () => {
-            console.log('canceled');
-          },
           style: 'cancel',
+          onPress: () => {
+            swipeableRef.current?.close();
+          },
         },
         {
           text: 'Delete',
@@ -64,6 +84,7 @@ export const USSDCodeScreen = () => {
   const _renderItem = ({ item }: { item: IUSSDCodeData }) => {
     return (
       <Swipeable
+        ref={swipeableRef}
         rightAction={
           <IconButton
             icon={props => <Icon name="Delete" {...props} />}
@@ -74,24 +95,43 @@ export const USSDCodeScreen = () => {
           />
         }
       >
-        <List.Item
-          title={item.description}
+        <TouchableOpacity
           onPress={() => openUSSSHandlerForm(item)}
           onLongPress={() => {
-            toogleFavorite(item.code, !Boolean(item.isFavorite));
+            toogleFavorite(item, Boolean(item.isFavorite));
           }}
-          left={props => (
-            <Icon
-              {...props}
-              name="DialPad"
-              color={item.isFavorite ? theme.colors.primary : props.color}
+          style={styles.listItem}
+        >
+          <View
+            style={[
+              globalStyles.fullWidth,
+              globalStyles.row,
+              globalStyles.spacedRow,
+            ]}
+          >
+            <IconButton
+              icon={props => (
+                <Icon
+                  {...props}
+                  name="DialPad"
+                  color={item.isFavorite ? theme.colors.primary : props.color}
+                />
+              )}
             />
-          )}
-          right={props => (
-            <Icon {...props} name="ArrowForward" color={theme.colors.outline} />
-          )}
-          style={[globalStyles.fullWidth]}
-        />
+            <View style={styles.listItemContent}>
+              <Text variant="bodyLarge">{item.description}</Text>
+            </View>
+            <IconButton
+              icon={props => (
+                <Icon
+                  {...props}
+                  name="ArrowForward"
+                  color={theme.colors.outline}
+                />
+              )}
+            />
+          </View>
+        </TouchableOpacity>
       </Swipeable>
     );
   };
@@ -102,9 +142,17 @@ export const USSDCodeScreen = () => {
         data={USSDCodes}
         renderItem={_renderItem}
         keyExtractor={item => item.code}
-        contentContainerStyle={[globalStyles.spacingSm]}
+        contentContainerStyle={styles.listContentContainer}
       />
       <NewCodeForm />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  listContentContainer: { gap: moderateScale(4) },
+  listItem: {},
+  listItemContent: {
+    flexGrow: 1,
+  },
+});
