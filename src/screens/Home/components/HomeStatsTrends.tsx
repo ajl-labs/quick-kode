@@ -38,11 +38,7 @@ export const HomeStatsTrends: React.FC<HomeStatsTrendsProps> = () => {
           minHeight: STATS_CARD_HEIGTH + ThemeSpacings.sm * 2,
         },
       ]}
-      contentContainerStyle={[
-        globalStyles.spacingSm,
-        globalStyles.gap,
-        globalStyles.centered,
-      ]}
+      contentContainerStyle={[globalStyles.gap, globalStyles.centered]}
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
     >

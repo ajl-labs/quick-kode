@@ -57,7 +57,6 @@ export const HomeScreen = () => {
           value={formatCurrency(transactionStats.totalFees)}
         />
       </View>
-      <HomeStatsTrends />
       <TransactionsList
         data={transactions}
         title="Recent Transactions"
@@ -69,6 +68,7 @@ export const HomeScreen = () => {
               globalStyles.fullWidth,
             ]}
           >
+            <HomeStatsTrends />
             <Text variant="titleMedium">Quick Actions</Text>
             <HomeQuickActions style={styles.quickActionContainer} />
             <View style={[globalStyles.spacedRow, globalStyles.fullWidth]}>
