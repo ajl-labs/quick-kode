@@ -7,6 +7,8 @@ import {
   postTransactionData,
   updateTransactionData,
 } from './transaction.thunk';
+import { formatDate } from '../../../common/helpers/date.helpers';
+import { startCase } from 'lodash';
 
 const initialState: {
   transactions: Record<string, IDataBaseRecord<ITransaction>>;
@@ -57,12 +59,14 @@ const historySlice = createSlice({
         }
       })
       .addCase(fetchTransactionData.fulfilled, (state, action) => {
-        const { data } = action.payload as PaginatedResponse<ITransaction>;
-        if (data && Array.isArray(data)) {
-          state.transactions = data.reduce((acc, transaction) => {
-            acc[transaction.id] = transaction;
-            return acc;
-          }, {} as Record<string, IDataBaseRecord<ITransaction>>);
+        if (action.payload) {
+          const { data } = action.payload as PaginatedResponse<ITransaction>;
+          if (data && Array.isArray(data)) {
+            state.transactions = data.reduce((acc, transaction) => {
+              acc[transaction.id] = transaction;
+              return acc;
+            }, {} as Record<string, IDataBaseRecord<ITransaction>>);
+          }
         }
       })
       .addCase(updateTransactionData.fulfilled, (state, action) => {
@@ -138,16 +142,28 @@ export const selectTransactionStatsSummary = (state: RootState) =>
 export const selectTransactionStatsTrends = createSelector(
   (state: RootState) => state.transactions.stats.trends,
   trends => {
-    const totalSpending = trends.monthlySpending.reduce(
+    const totalSpending = trends.spendingByCategory?.reduce(
       (acc, curr) => acc + curr.total_amount,
       0,
     );
+
     return {
-      ...trends,
-      spendingByCategory: trends.spendingByCategory.map(item => ({
-        ...item,
-        total_amount: (item.total_amount / totalSpending) * 100,
-      })),
+      monthlySpending: trends.monthlySpending?.reduce(
+        (acc: { labels: string[]; data: number[] }, curr) => {
+          acc.labels.push(formatDate(curr.month, 'MMM YY'));
+          acc.data.push((curr.total_amount || 0) / 1000);
+          return acc;
+        },
+        { labels: [], data: [] },
+      ) || { labels: [], data: [] },
+      spendingByCategory: trends.spendingByCategory?.reduce(
+        (acc: { labels: string[]; data: number[] }, curr) => {
+          acc.labels.push(startCase(curr.label || 'Uknown'));
+          acc.data.push((curr.total_amount || 0) / totalSpending);
+          return acc;
+        },
+        { labels: [], data: [] },
+      ),
     };
   },
 );

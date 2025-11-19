@@ -216,7 +216,6 @@ export const fetchTransactionStatsTrends = createAsyncThunk(
       let errorMessage =
         'Failed to fetch transaction stats trends from webhook.';
       if (isAxiosError(error)) {
-        console.log(error.response);
         if (error.response?.data?.message) {
           errorMessage = error.response.data.message;
         }

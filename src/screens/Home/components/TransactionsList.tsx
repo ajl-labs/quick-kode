@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react';
 import { Button, Chip, Text, useTheme } from 'react-native-paper';
-import { FlatList, FlatListProps, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import globalStyles from '../../../common/styles/global.styles';
 import { TransactionListItem } from './TransactionListItem';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,13 +19,15 @@ import { Icon } from '../../../common/components';
 import { to_snake_case } from '../../../common/helpers/utils';
 import { updateTransactionData } from '../../../store/features/transactions/transaction.thunk';
 import { AppDispatch } from '../../../store';
+import ReAnimated, { FlatListPropsWithLayout } from 'react-native-reanimated';
+
 import {
   CustomBottomSheet,
   CustomBottomSheetHandles,
 } from '../../../common/components/CustomBottomSheet';
 
 interface TransactionsListProps
-  extends Partial<FlatListProps<IDataBaseRecord<ITransaction>>> {
+  extends Partial<FlatListPropsWithLayout<IDataBaseRecord<ITransaction>>> {
   data: IDataBaseRecord<ITransaction>[];
   onViewAllPress?: () => void;
   title?: string;
@@ -161,7 +163,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
 
   return (
     <>
-      <FlatList<IDataBaseRecord<ITransaction>>
+      <ReAnimated.FlatList<IDataBaseRecord<ITransaction>>
         data={data}
         keyExtractor={item => item.id}
         renderItem={renderTransactionItem}

@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     rowGap: ThemeSpacings.sm,
     columnGap: ThemeSpacings.sm,
-    ...globalStyles.spacingSm,
   },
 });
 
@@ -47,16 +46,6 @@ export const HomeScreen = () => {
 
   return (
     <Container style={globalStyles.noSpacing}>
-      <View style={styles.statSection}>
-        <StatCard
-          title="Balance"
-          value={formatCurrency(transactionStats.balance)}
-        />
-        <StatCard
-          title="Fees"
-          value={formatCurrency(transactionStats.totalFees)}
-        />
-      </View>
       <TransactionsList
         data={transactions}
         title="Recent Transactions"
@@ -68,6 +57,16 @@ export const HomeScreen = () => {
               globalStyles.fullWidth,
             ]}
           >
+            <View style={styles.statSection}>
+              <StatCard
+                title="Balance"
+                value={formatCurrency(transactionStats.balance)}
+              />
+              <StatCard
+                title="Fees"
+                value={formatCurrency(transactionStats.totalFees)}
+              />
+            </View>
             <HomeStatsTrends />
             <Text variant="titleMedium">Quick Actions</Text>
             <HomeQuickActions style={styles.quickActionContainer} />
