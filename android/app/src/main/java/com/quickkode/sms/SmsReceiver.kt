@@ -77,7 +77,6 @@ class SmsReceiver : BroadcastReceiver() {
                 putExtra("messageId", messageId)
             }
 
-
             context.startService(serviceIntent)
             HeadlessJsTaskService.acquireWakeLockNow(context)
 

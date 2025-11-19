@@ -31,22 +31,22 @@ declare global {
 // For Stack Screens:
 export type AllHistoryScreenProps = NativeStackScreenProps<
   HomeStackParamList,
-  'AllHistory'
+  HomeStackScreens.AllTransactions
 >;
 
 // For Tab Screens (these are nested, so we use CompositeScreenProps)
 export type HomeScreenInTabProps = CompositeScreenProps<
-  BottomTabScreenProps<HomeTabParamList, 'Home'>,
+  BottomTabScreenProps<HomeTabParamList, HomeTabScreens.Home>,
   NativeStackScreenProps<HomeStackParamList>
 >;
 
 export type HistoryScreenInTabProps = CompositeScreenProps<
-  BottomTabScreenProps<HomeTabParamList, 'History'>,
+  BottomTabScreenProps<HomeTabParamList, HomeTabScreens.History>,
   NativeStackScreenProps<HomeStackParamList>
 >;
 
 export type SettingsScreenInTabProps = CompositeScreenProps<
-  BottomTabScreenProps<HomeTabParamList, 'Settings'>,
+  BottomTabScreenProps<HomeTabParamList, HomeTabScreens.Settings>,
   NativeStackScreenProps<HomeStackParamList>
 >;
 

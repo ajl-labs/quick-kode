@@ -1,4 +1,4 @@
-import { Badge, List, Text, useTheme } from 'react-native-paper';
+import { Badge, List, ListItemProps, Text, useTheme } from 'react-native-paper';
 import { Icon, IconProps } from '../../../common/components/Icon';
 import React from 'react';
 import { Style } from 'react-native-paper/lib/typescript/components/List/utils';
@@ -12,25 +12,29 @@ import {
 } from '../../../common/constants/enum';
 import { moderateScale } from 'react-native-size-matters';
 
-interface TransactionListItemProps {
-  type: ITransaction['type'];
-  title: string;
-  summary: string;
-  rightUpText?: string;
-  rightBottomText?: string;
+import {
+  formatDate,
+  formatRelativeTime,
+  isToday,
+} from '../../../common/helpers/date.helpers';
+import { formatCurrency } from '../../../common/helpers/currency.helpers';
+import { extractTransactionSummary } from '../../../common/helpers/transaction.helper';
+
+interface TransactionListItemProps extends Omit<ListItemProps, 'title'> {
+  item: IDataBaseRecord<ITransaction>;
   iconType?: TransactionCategory | TransactionType;
-  description?: string;
+  onPress?: () => void;
+  transactionLabels?: TransactionLabel[];
+  showMessage?: boolean;
+  title?: ListItemProps['title'];
 }
 
 type ItemExtraComponentProps = { color: string; style?: Style | undefined };
 export const TransactionListItem: React.FC<TransactionListItemProps> = ({
-  type,
-  title,
-  description,
-  summary,
-  rightUpText,
-  rightBottomText,
+  item,
   iconType,
+  showMessage,
+  ...props
 }) => {
   const theme = useTheme();
   const iconNames: Partial<
@@ -47,7 +51,7 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
   const iconColor = theme.colors.primary;
 
   const renderIcon = (props: ItemExtraComponentProps) => {
-    let iconName = type === 'DEBIT' ? iconNames.DEBIT : iconNames.CREDIT;
+    let iconName = item.type === 'DEBIT' ? iconNames.DEBIT : iconNames.CREDIT;
     if (iconType && iconNames[iconType]) {
       iconName = iconNames[iconType];
     }
@@ -59,7 +63,7 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
             {
               backgroundColor: iconBackground,
               borderRadius: theme.roundness,
-              ...(description && summary ? { alignSelf: 'flex-start' } : {}),
+              ...(item.summary ? { alignSelf: 'flex-start' } : {}),
             },
           ]}
         >
@@ -71,54 +75,60 @@ export const TransactionListItem: React.FC<TransactionListItemProps> = ({
   };
 
   const renderRightContent = () => {
-    if (rightUpText || rightBottomText) {
-      return (
-        <View style={[styles.rightContentContainer]}>
-          {rightUpText && <Text variant="bodySmall">{rightUpText}</Text>}
-          {rightBottomText && (
-            <Badge
-              size={20}
-              theme={{
-                colors: {
-                  error: iconBackground,
-                  onError: iconColor,
-                },
-              }}
-              style={{
-                borderRadius: theme.roundness / 2,
-                fontSize: moderateScale(8),
-              }}
-            >
-              {rightBottomText}
-            </Badge>
-          )}
-        </View>
-      );
+    let transactionDate = item.completed_at || item.created_at;
+
+    if (isToday(transactionDate)) {
+      transactionDate = formatRelativeTime(transactionDate);
+    } else {
+      transactionDate = formatDate(transactionDate, 'DD/MM/YY');
     }
-    return null;
+
+    return (
+      <View style={[styles.rightContentContainer]}>
+        <Text variant="bodySmall">{transactionDate}</Text>
+        {item.label && (
+          <Badge
+            size={20}
+            theme={{
+              colors: {
+                error: iconBackground,
+                onError: iconColor,
+              },
+            }}
+            style={{
+              borderRadius: theme.roundness / 2,
+              fontSize: moderateScale(8),
+            }}
+          >
+            {item.label}
+          </Badge>
+        )}
+      </View>
+    );
   };
   return (
-    <List.Item
-      title={<Text variant="titleSmall">{title}</Text>}
-      description={props => (
-        <View style={[globalStyles.column, globalStyles.gapSm]}>
-          {summary && (
-            <Text variant="bodySmall" style={{ color: props.color }}>
-              {summary}
+    <>
+      <List.Item
+        {...props}
+        title={<Text variant="titleSmall">{formatCurrency(item.amount)}</Text>}
+        description={props => (
+          <View style={[globalStyles.column, globalStyles.gapSm]}>
+            <Text variant="labelSmall" style={{ color: props.color }}>
+              {item.summary || extractTransactionSummary(item)}
             </Text>
-          )}
-          {description && (
-            <Text variant="bodySmall" style={{ fontSize: moderateScale(10) }}>
-              {description}
-            </Text>
-          )}
-        </View>
-      )}
-      left={renderIcon}
-      right={renderRightContent}
-      containerStyle={styles.containerStyle}
-      style={globalStyles.removePadding}
-    />
+            {Boolean(item.message && showMessage) && (
+              <Text variant="bodySmall" style={{ fontSize: moderateScale(10) }}>
+                {item.message}
+              </Text>
+            )}
+          </View>
+        )}
+        left={renderIcon}
+        right={renderRightContent}
+        containerStyle={[styles.containerStyle, props.containerStyle]}
+        style={[globalStyles.removePadding, props.style]}
+      />
+    </>
   );
 };
 

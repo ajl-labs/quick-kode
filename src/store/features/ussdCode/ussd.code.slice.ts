@@ -71,7 +71,6 @@ export const selectFavoriteUSSDCodes = createSelector(
       .sort((a, b) => (b.usedCount ?? 0) - (a.usedCount ?? 0))
       .slice(0, 5),
 );
-export const selectAllUSSDCodesObject = createSelector(
-  (state: RootState) => state.ussdCode.codes,
-  codes => codes,
-);
+
+export const selectAllUSSDCodesObject = (state: RootState) =>
+  state.ussdCode.codes;

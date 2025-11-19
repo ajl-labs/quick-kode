@@ -6,6 +6,7 @@ import { ThemeSpacings } from '../config/theme';
 import { HomeTabScreens } from './navigation.constants';
 import { HomeTabParamList } from './types';
 import { SettingsStack } from './SettingsStack';
+import { BottomTabHeader } from '../common/components/Header/ScreenHeader';
 
 const Tab = createBottomTabNavigator<HomeTabParamList>();
 
@@ -22,7 +23,9 @@ export const HomeTabs = () => {
         name={HomeTabScreens.Home}
         component={HomeScreen}
         options={{
-          tabBarLabel: 'Home',
+          header: props => {
+            return <BottomTabHeader {...props} />;
+          },
           headerTitle: 'Quick Kode',
           tabBarIcon: ({ color, size }) => (
             <Icon name="Home" color={color} size={size} />

@@ -13,10 +13,11 @@ import { useNavigation } from '@react-navigation/native';
 import { HomeStackScreens } from '../../navigation/navigation.constants';
 import {
   selectRecentTransactions,
-  selectTransactionStats,
+  selectTransactionStatsSummary,
 } from '../../store/features/transactions/transaction.slice';
-import { fetchTransactionStats } from '../../store/features/transactions/transaction.thunk';
+import { fetchTransactionStatsSummary } from '../../store/features/transactions/transaction.thunk';
 import { AppDispatch } from '../../store';
+import { HomeStatsTrends } from './components/HomeStatsTrends';
 
 const styles = StyleSheet.create({
   quickActionContainer: {
@@ -38,10 +39,10 @@ export const HomeScreen = () => {
   const navigation = useNavigation();
 
   const transactions = useSelector(selectRecentTransactions);
-  const transactionStats = useSelector(selectTransactionStats);
+  const transactionStats = useSelector(selectTransactionStatsSummary);
 
   useEffect(() => {
-    dispatch(fetchTransactionStats());
+    dispatch(fetchTransactionStatsSummary());
   }, []);
 
   return (
@@ -56,13 +57,10 @@ export const HomeScreen = () => {
           value={formatCurrency(transactionStats.totalFees)}
         />
       </View>
+      <HomeStatsTrends />
       <TransactionsList
         data={transactions}
-        onViewAllPress={() =>
-          navigation.navigate(HomeStackScreens.AllTransactions)
-        }
         title="Recent Transactions"
-        expanded={false}
         ListHeaderComponent={
           <View
             style={[

@@ -1,5 +1,5 @@
 import { RootState } from '.';
-import { omit } from 'lodash';
+import { omit, pick } from 'lodash';
 import { DEFAULT_USSD_CODE_CONFIG } from '../common/constants/default.state';
 
 // define your migrations
@@ -38,6 +38,29 @@ const storeMigration = {
       ussdCode: {
         ...state.ussdCode,
         codes: DEFAULT_USSD_CODE_CONFIG,
+      },
+    };
+  },
+  5: (state: RootState): RootState => {
+    return {
+      _persist: state._persist,
+      settings: state.settings,
+      retryQueue: state.retryQueue,
+      ussdCode: state.ussdCode,
+      transactions: {
+        ...state.transactions,
+        transactions: state.transactions.transactions,
+        stats: {
+          summary: state.transactions.stats.summary || {
+            totalFees: null,
+            totalTransactions: null,
+            balance: null,
+          },
+          trends: {
+            monthlySpending: [],
+            spendingByCategory: [],
+          },
+        },
       },
     };
   },

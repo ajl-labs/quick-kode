@@ -43,9 +43,24 @@ declare global {
     messageId: string;
   }
 
-  interface ITransactionStats {
+  interface ITransactionStatsSummary {
     balance: number | null;
     totalTransactions: number | null;
     totalFees: number | null;
+  }
+  interface IMonthlyStats {
+    month: string;
+    total_amount: number;
+    total_fees: number;
+  }
+
+  interface ISpendingByCategory {
+    label: string;
+    total_amount: number;
+    total_fees: number;
+  }
+  interface ITransactionStatsTrends {
+    monthlySpending: IMonthlyStats[];
+    spendingByCategory: ISpendingByCategory[];
   }
 }

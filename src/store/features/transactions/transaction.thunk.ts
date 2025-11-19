@@ -1,10 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios, { isAxiosError } from 'axios';
 import { RootState } from '../..';
-import {
-  addTransactionLabel,
-  markWebhookAsFailed,
-} from '../settings/settings.slice';
+import { markWebhookAsFailed } from '../settings/settings.slice';
 import { WEBHOOK_ACTIONS_KEY } from '../../../common/constants/webhook.actions';
 import {
   replaceUrlPlaceholders,
@@ -49,7 +46,7 @@ export const postTransactionData = createAsyncThunk(
         dispatch(
           removePostTransactionRequest({ key: transactionData.messageId }),
         );
-        dispatch(fetchTransactionStats());
+        dispatch(fetchTransactionStatsSummary());
       }
 
       return data;
@@ -126,6 +123,7 @@ export const fetchTransactionData = createAsyncThunk(
       });
       return responseData;
     } catch (error) {
+      console.log('failed to fetch transaction data from webhook', error);
       if (isAxiosError(error)) {
         console.log(error.response);
       }
@@ -178,19 +176,45 @@ export const updateTransactionData = createAsyncThunk(
   },
 );
 
-export const fetchTransactionStats = createAsyncThunk(
-  'stats/fetchTransactionStats',
+export const fetchTransactionStatsSummary = createAsyncThunk(
+  'stats/fetchTransactionStatsSummary',
   async (_, { getState }) => {
     try {
       const { webhookAuth, webhooks } = (getState() as RootState).settings;
       const { url } = webhooks[WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT] || {};
       if (!url) return;
-      const { data } = await axios.get(`${url.trim()}/dashboard/stats`, {
+      const { data } = await axios.get(`${url.trim()}/stats/summary`, {
         auth: webhookAuth,
       });
       return data;
     } catch (error) {
       let errorMessage = 'Failed to fetch transaction stats from webhook.';
+      if (isAxiosError(error)) {
+        console.log(error.response);
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        }
+      }
+      showAndroidToast(errorMessage, 'LONG');
+      return;
+    }
+  },
+);
+
+export const fetchTransactionStatsTrends = createAsyncThunk(
+  'stats/fetchTransactionStatsTrends',
+  async (_, { getState }) => {
+    try {
+      const { webhookAuth, webhooks } = (getState() as RootState).settings;
+      const { url } = webhooks[WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT] || {};
+      if (!url) return;
+      const { data } = await axios.get(`${url.trim()}/stats/trends`, {
+        auth: webhookAuth,
+      });
+      return data;
+    } catch (error) {
+      let errorMessage =
+        'Failed to fetch transaction stats trends from webhook.';
       if (isAxiosError(error)) {
         console.log(error.response);
         if (error.response?.data?.message) {
