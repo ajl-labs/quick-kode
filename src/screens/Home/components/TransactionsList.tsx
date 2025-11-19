@@ -1,22 +1,14 @@
-import React, { useCallback, useState } from 'react';
-import {
-  Button,
-  Chip,
-  Dialog,
-  Portal,
-  Text,
-  useTheme,
-} from 'react-native-paper';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Button, Chip, Text, useTheme } from 'react-native-paper';
 import { FlatList, FlatListProps, TouchableOpacity, View } from 'react-native';
 import globalStyles from '../../../common/styles/global.styles';
 import { TransactionListItem } from './TransactionListItem';
-
-import {
-  formatDate,
-  formatRelativeTime,
-  isToday,
-} from '../../../common/helpers/date.helpers';
-import { formatCurrency } from '../../../common/helpers/currency.helpers';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   selectTransactionLabelEnabled,
@@ -27,22 +19,27 @@ import { Icon } from '../../../common/components';
 import { to_snake_case } from '../../../common/helpers/utils';
 import { updateTransactionData } from '../../../store/features/transactions/transaction.thunk';
 import { AppDispatch } from '../../../store';
-import { extractTransactionSummary } from '../../../common/helpers/transaction.helper';
+import {
+  CustomBottomSheet,
+  CustomBottomSheetHandles,
+} from '../../../common/components/CustomBottomSheet';
 
 interface TransactionsListProps
   extends Partial<FlatListProps<IDataBaseRecord<ITransaction>>> {
   data: IDataBaseRecord<ITransaction>[];
   onViewAllPress?: () => void;
   title?: string;
-  expanded?: boolean;
+  showMessage?: boolean;
 }
 export const TransactionsList: React.FC<TransactionsListProps> = ({
   data,
   onViewAllPress,
   title,
-  expanded,
+  showMessage,
   ...props
 }) => {
+  const customBottomSheetRef = useRef<CustomBottomSheetHandles>(null);
+  const customBottomSheetOpenRef = useRef<boolean>(null);
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const transactionLabels = useSelector(selectTransactionLabels);
@@ -56,33 +53,18 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
   }: {
     item: IDataBaseRecord<ITransaction>;
   }) => {
-    const extraProps = { rightUpText: '', rightBottomText: '' };
-    const transactionDate = item.completed_at || item.created_at;
-
-    if (isToday(transactionDate)) {
-      extraProps['rightUpText'] = formatRelativeTime(transactionDate);
-    } else {
-      extraProps['rightUpText'] = formatDate(transactionDate, 'DD/MM/YY');
-    }
-
-    if (item.label) {
-      extraProps['rightBottomText'] = item.label;
-    }
-
     return (
       <TouchableOpacity
-        onLongPress={() => {
-          setShowLabelDialog(true);
-          setSelectedTransaction(item);
-        }}
         disabled={!transactionLabelEnabled}
+        onLongPress={() => {
+          setSelectedTransaction(item);
+          setShowLabelDialog(true);
+        }}
       >
         <TransactionListItem
-          type={item.type}
-          title={formatCurrency(item.amount)}
-          summary={extractTransactionSummary(item)}
-          {...(expanded ? { description: item.message } : {})}
-          {...extraProps}
+          item={item}
+          transactionLabels={Object.values(transactionLabels)}
+          showMessage={showMessage}
         />
       </TouchableOpacity>
     );
@@ -123,6 +105,60 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
     [dispatch, selectedTransaction],
   );
 
+  useEffect(() => {
+    if (customBottomSheetOpenRef.current == showLabelDialog) {
+      return;
+    }
+    if (showLabelDialog) {
+      customBottomSheetRef.current?.present();
+    } else {
+      customBottomSheetRef.current?.dismiss();
+    }
+    customBottomSheetOpenRef.current = showLabelDialog;
+  }, [showLabelDialog]);
+
+  const renderLabelDialog = useMemo(() => {
+    return (
+      transactionLabelEnabled && (
+        <CustomBottomSheet
+          ref={customBottomSheetRef}
+          onOpenChange={isOpen => {
+            setShowLabelDialog(isOpen);
+          }}
+        >
+          <View
+            style={[
+              globalStyles.row,
+              { gap: ThemeSpacings.md, flexWrap: 'wrap' },
+            ]}
+          >
+            {Object.values(transactionLabels).map(label => {
+              return (
+                <Chip
+                  key={label.name}
+                  icon={() =>
+                    to_snake_case(selectedTransaction?.label || '') ===
+                    to_snake_case(label.name) ? (
+                      <Icon name="Check" color={theme.colors.primary} />
+                    ) : null
+                  }
+                  onPress={() => {
+                    setShowLabelDialog(false);
+                    if (selectedTransaction?.id) {
+                      handleAddLabelToTransaction(label.name);
+                    }
+                  }}
+                >
+                  {label.name}
+                </Chip>
+              );
+            })}
+          </View>
+        </CustomBottomSheet>
+      )
+    );
+  }, [selectedTransaction, showLabelDialog]);
+
   return (
     <>
       <FlatList<IDataBaseRecord<ITransaction>>
@@ -133,47 +169,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
         ListHeaderComponent={renderHeader}
         {...props}
       />
-      <Portal>
-        <Dialog
-          visible={showLabelDialog}
-          onDismiss={() => setShowLabelDialog(false)}
-          style={{ borderRadius: theme.roundness }}
-        >
-          <Dialog.Content>
-            <View
-              style={[
-                globalStyles.row,
-                { gap: ThemeSpacings.md, flexWrap: 'wrap' },
-              ]}
-            >
-              {Object.values(transactionLabels).map(label => {
-                return (
-                  <Chip
-                    key={label.name}
-                    icon={() =>
-                      to_snake_case(selectedTransaction?.label || '') ===
-                      to_snake_case(label.name) ? (
-                        <Icon name="Check" color={theme.colors.primary} />
-                      ) : null
-                    }
-                    onPress={() => {
-                      if (selectedTransaction?.id) {
-                        handleAddLabelToTransaction(label.name);
-                      }
-                      setShowLabelDialog(false);
-                    }}
-                  >
-                    {label.name}
-                  </Chip>
-                );
-              })}
-            </View>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setShowLabelDialog(false)}>Close</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      {renderLabelDialog}
     </>
   );
 };

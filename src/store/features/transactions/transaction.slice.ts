@@ -2,20 +2,30 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../..';
 import {
   fetchTransactionData,
-  fetchTransactionStats,
+  fetchTransactionStatsSummary,
+  fetchTransactionStatsTrends,
   postTransactionData,
   updateTransactionData,
 } from './transaction.thunk';
 
 const initialState: {
   transactions: Record<string, IDataBaseRecord<ITransaction>>;
-  stats: ITransactionStats;
+  stats: {
+    summary: ITransactionStatsSummary;
+    trends: ITransactionStatsTrends;
+  };
 } = {
   transactions: {},
   stats: {
-    totalTransactions: null,
-    totalFees: null,
-    balance: null,
+    summary: {
+      totalTransactions: null,
+      totalFees: null,
+      balance: null,
+    },
+    trends: {
+      monthlySpending: [],
+      spendingByCategory: [],
+    },
   },
 };
 
@@ -23,18 +33,6 @@ const historySlice = createSlice({
   name: 'history',
   initialState,
   reducers: {
-    setTransactionStats(
-      state,
-      action: {
-        payload: Partial<ITransactionStats>;
-        type: string;
-      },
-    ) {
-      state.transactions.stats = {
-        ...state.transactions.stats,
-        ...action.payload,
-      };
-    },
     updateTransactionState(
       state,
       action: { payload: Partial<IDataBaseRecord<ITransaction>>; type: string },
@@ -52,23 +50,19 @@ const historySlice = createSlice({
     builder
       .addCase(postTransactionData.fulfilled, (state, action) => {
         if (action.payload?.id) {
-          state['transactions'] = {
+          state.transactions = {
             ...state.transactions,
             [action.payload.id]: action.payload,
           };
         }
       })
       .addCase(fetchTransactionData.fulfilled, (state, action) => {
-        const { data, total, page, limit } =
-          action.payload as PaginatedResponse<ITransaction>;
+        const { data } = action.payload as PaginatedResponse<ITransaction>;
         if (data && Array.isArray(data)) {
-          state['transactions'] = {
-            ...state.transactions,
-            ...data.reduce((acc, transaction) => {
-              acc[transaction.id] = transaction;
-              return acc;
-            }, {} as Record<string, IDataBaseRecord<ITransaction>>),
-          };
+          state.transactions = data.reduce((acc, transaction) => {
+            acc[transaction.id] = transaction;
+            return acc;
+          }, {} as Record<string, IDataBaseRecord<ITransaction>>);
         }
       })
       .addCase(updateTransactionData.fulfilled, (state, action) => {
@@ -79,20 +73,41 @@ const historySlice = createSlice({
           };
         }
       })
-      .addCase(fetchTransactionStats.fulfilled, (state, action) => {
+      .addCase(fetchTransactionStatsSummary.fulfilled, (state, action) => {
         if (action.payload) {
-          state['stats'] = {
-            ...state.transactions.stats,
+          state.stats.summary = {
+            ...state.stats.summary,
             ...action.payload,
           };
         }
-      });
+      })
+      .addCase(
+        fetchTransactionStatsTrends.fulfilled,
+        (
+          state,
+          action: {
+            payload: {
+              monthlySpending: ITransactionStatsTrends['monthlySpending'];
+              spendingByCategory: ITransactionStatsTrends['spendingByCategory'];
+            };
+            type: string;
+          },
+        ) => {
+          if (action.payload) {
+            state.stats.trends = {
+              ...state.stats.trends,
+              monthlySpending: action.payload.monthlySpending,
+              spendingByCategory: action.payload.spendingByCategory,
+            };
+          }
+        },
+      );
   },
 });
 
 const { actions, reducer } = historySlice;
 
-export const { setTransactionStats, updateTransactionState } = actions;
+export const { updateTransactionState } = actions;
 
 export default reducer;
 
@@ -117,5 +132,22 @@ export const selectRecentTransactions = createSelector(
   transactions => transactions.slice(0, 5),
 );
 
-export const selectTransactionStats = (state: RootState) =>
-  state.transactions.stats;
+export const selectTransactionStatsSummary = (state: RootState) =>
+  state.transactions.stats.summary;
+
+export const selectTransactionStatsTrends = createSelector(
+  (state: RootState) => state.transactions.stats.trends,
+  trends => {
+    const totalSpending = trends.monthlySpending.reduce(
+      (acc, curr) => acc + curr.total_amount,
+      0,
+    );
+    return {
+      ...trends,
+      spendingByCategory: trends.spendingByCategory.map(item => ({
+        ...item,
+        total_amount: (item.total_amount / totalSpending) * 100,
+      })),
+    };
+  },
+);

@@ -15,8 +15,8 @@ const responsiveFonts = configureFonts({
       ...acc,
       [key]: {
         ...font,
-        fontSize: moderateScale(font.fontSize),
-        lineHeight: moderateScale(font.lineHeight),
+        fontSize: moderateScale(font.fontSize) ?? 12,
+        lineHeight: moderateScale(font.lineHeight) ?? 16,
       },
     };
   }, {} as MD3Theme['fonts']),
@@ -38,7 +38,21 @@ export const darkTheme: MD3Theme = {
   ...MD3DarkTheme,
   colors: {
     ...MD3DarkTheme.colors,
-    primary: '#AFF21E', //  green on dark
+    primary: '#aff21e',
+    primaryContainer: '#d7fb9b',
+    onPrimary: '#e7fcc3',
+    inversePrimary: '#baf54c',
+
+    // primary100: '#f5fee7',
+    // primary90: '#e7fcc3',
+    // primary80: '#d7fb9b',
+    // primary70: '#c7f870',
+    // primary60: '#baf54c',
+    // primary50: '#aff21e', // the base color
+    // primary40: '#a5df11',
+    // primary30: '#97c800',
+    // primary20: '#8bb000',
+    // primary10: '#768800',
   },
   fonts: responsiveFonts,
   roundness: moderateScale(4),

@@ -89,8 +89,6 @@ export const NewCodeForm = () => {
             value={form.values.description}
             error={!!form.errors.description && form.touched.description}
             errorMessage={form.errors.description}
-            multiline
-            numberOfLines={3}
           />
           <Form.FormInput
             label="USSD Code Base"
