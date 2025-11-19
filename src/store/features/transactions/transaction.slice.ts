@@ -149,21 +149,21 @@ export const selectTransactionStatsTrends = createSelector(
 
     return {
       monthlySpending: trends.monthlySpending?.reduce(
-        (acc: { labels: string[]; data: number[] }, curr) => {
+        (acc: IStatCardPayload, curr) => {
           acc.labels.push(formatDate(curr.month, 'MMM YY'));
           acc.data.push((curr.total_amount || 0) / 1000);
           return acc;
         },
-        { labels: [], data: [] },
-      ) || { labels: [], data: [] },
+        { labels: [], data: [], key: 'monthlySpending' },
+      ) || { labels: [], data: [], key: 'monthlySpending' },
       spendingByCategory: trends.spendingByCategory?.reduce(
-        (acc: { labels: string[]; data: number[] }, curr) => {
+        (acc: IStatCardPayload, curr) => {
           acc.labels.push(startCase(curr.label || 'Uknown'));
           acc.data.push((curr.total_amount || 0) / totalSpending);
           return acc;
         },
-        { labels: [], data: [] },
-      ),
+        { labels: [], data: [], key: 'spendingByCategory' },
+      ) || { labels: [], data: [], key: 'monthlySpending' },
     };
   },
 );

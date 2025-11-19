@@ -12,6 +12,7 @@
     "e2e:android": "./maestro/run-test.sh",
     "build:android:prod": "ENVFILE=.env.production yarn react-native build-android --tasks assembleRelease && cp android/app/build/outputs/apk/release/app-release.apk ./files/quick-kode-release.apk",
     "adb:install:prod": "adb install -r ./files/quick-kode-release.apk",
+    "build:install:apk": "yarn build:android:prod && yarn adb:install:prod",
     "postinstall": "patch-package"
   },
   "dependencies": {

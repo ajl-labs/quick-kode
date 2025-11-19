@@ -63,4 +63,10 @@ declare global {
     monthlySpending: IMonthlyStats[];
     spendingByCategory: ISpendingByCategory[];
   }
+
+  interface IStatCardPayload {
+    labels: string[];
+    data: number[];
+    key: 'spendingByCategory' | 'monthlySpending';
+  }
 }
