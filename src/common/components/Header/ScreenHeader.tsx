@@ -7,16 +7,16 @@ import {
   View,
 } from 'react-native';
 import { Button, Text, useTheme } from 'react-native-paper';
-import { BottomTabHeaderProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import globalStyles from '../../styles/global.styles';
 import { showAndroidToast } from '../../helpers/utils';
+import { NativeStackHeaderProps } from '@react-navigation/native-stack';
 
 const READ_SMS_PERMISSION_MESSAGE =
   'We need SMS permission to read your transaction messages and help you track and analyze your finances.';
-interface IBottomTabHeaderProps extends BottomTabHeaderProps {}
 
-export const BottomTabHeader: React.FC<IBottomTabHeaderProps> = props => {
+export const HomeScreenHeader: React.FC<NativeStackHeaderProps> = props => {
+  console.log(props);
   const [hasReadSMSPermission, setHasReadSMSPermission] = useState<boolean>();
   const theme = useTheme();
   const insets = useSafeAreaInsets();

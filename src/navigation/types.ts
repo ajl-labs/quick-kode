@@ -1,19 +1,16 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import type {
-  CompositeScreenProps,
-  NavigatorScreenParams,
-} from '@react-navigation/native';
+import type { CompositeScreenProps } from '@react-navigation/native';
 import { HomeStackScreens, HomeTabScreens } from './navigation.constants';
 
 export type HomeTabParamList = {
   [HomeTabScreens.Home]: undefined;
-  [HomeTabScreens.History]: undefined;
+  [HomeTabScreens.USSDCode]: undefined;
   [HomeTabScreens.Settings]: undefined;
 };
 
 export type HomeStackParamList = {
-  [HomeStackScreens.HomeTabs]: NavigatorScreenParams<HomeTabParamList>;
+  [HomeStackScreens.Home]: undefined;
   [HomeStackScreens.AllTransactions]: undefined; // AllHistory screen takes no params
 };
 
@@ -41,7 +38,7 @@ export type HomeScreenInTabProps = CompositeScreenProps<
 >;
 
 export type HistoryScreenInTabProps = CompositeScreenProps<
-  BottomTabScreenProps<HomeTabParamList, HomeTabScreens.History>,
+  BottomTabScreenProps<HomeTabParamList, HomeTabScreens.USSDCode>,
   NativeStackScreenProps<HomeStackParamList>
 >;
 

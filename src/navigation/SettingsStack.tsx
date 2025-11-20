@@ -10,6 +10,7 @@ export const SettingsStack = () => {
       initialRouteName={SettingsStackScreens.SettingsMenu}
       screenOptions={{
         animation: 'slide_from_right',
+        headerShadowVisible: false,
       }}
     >
       <Stack.Screen

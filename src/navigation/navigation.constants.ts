@@ -1,15 +1,20 @@
 export enum HomeStackScreens {
-  HomeTabs = 'HomeTabs',
+  Home = 'Home',
   AllTransactions = 'AllTransactions',
 }
 
 export enum HomeTabScreens {
-  Home = 'Home',
-  History = 'History',
+  Home = 'HomeStack',
+  USSDCode = 'USSDCode',
   Settings = 'Settings',
 }
 
 export enum SettingsStackScreens {
   SettingsMenu = 'SettingsMenu',
   WebhookSettings = 'WebhookSettings',
+}
+
+export enum USSDCodeStackScreens {
+  USSDCodeMenu = 'USSDCodeMenu',
+  USSDCodeSettings = 'USSDCodeSettings',
 }

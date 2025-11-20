@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { HomeStack } from './HomeStack';
 import { MD3Theme } from 'react-native-paper';
 import { USSDCodeHandlerProvider } from '../common/Context/USSDCodeHandler';
+import { HomeTabs } from './HomeTabs';
 interface NavigationProps {
   theme: MD3Theme;
 }
@@ -24,7 +24,7 @@ export const Navigation: React.FC<NavigationProps> = ({ theme }) => {
       }}
     >
       <USSDCodeHandlerProvider>
-        <HomeStack />
+        <HomeTabs />
       </USSDCodeHandlerProvider>
     </NavigationContainer>
   );

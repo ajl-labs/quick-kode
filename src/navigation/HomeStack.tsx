@@ -1,24 +1,29 @@
 import * as React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { HomeTabs } from './HomeTabs';
 import { AllTransactions } from '../screens/AllTransactions';
 import { HomeStackParamList } from './types';
 import { HomeStackScreens } from './navigation.constants';
+import { HomeScreen } from '../screens';
+import { HomeScreenHeader } from '../common/components/Header/ScreenHeader';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 
 export const HomeStack = () => {
   return (
     <Stack.Navigator
-      initialRouteName={HomeStackScreens.HomeTabs}
+      initialRouteName={HomeStackScreens.Home}
       screenOptions={{
         animation: 'slide_from_right',
+        headerShadowVisible: false,
       }}
     >
       <Stack.Screen
-        name={HomeStackScreens.HomeTabs}
-        component={HomeTabs}
-        options={{ headerShown: false }}
+        name={HomeStackScreens.Home}
+        component={HomeScreen}
+        options={{
+          headerTitle: 'Quick Kode',
+          header: props => <HomeScreenHeader {...props} />,
+        }}
       />
       <Stack.Screen
         name={HomeStackScreens.AllTransactions}

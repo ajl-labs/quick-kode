@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { HomeScreen, USSDCodeScreen } from '../screens';
+import { USSDCodeScreen } from '../screens';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon } from '../common/components';
 import { ThemeSpacings } from '../config/theme';
-import { HomeTabScreens } from './navigation.constants';
+import { HomeTabScreens, USSDCodeStackScreens } from './navigation.constants';
 import { HomeTabParamList } from './types';
 import { SettingsStack } from './SettingsStack';
-import { BottomTabHeader } from '../common/components/Header/ScreenHeader';
+import { HomeStack } from './HomeStack';
+import { USSDCodeStack } from './USSDCodeStack';
 
 const Tab = createBottomTabNavigator<HomeTabParamList>();
 
@@ -17,16 +18,14 @@ export const HomeTabs = () => {
         tabBarStyle: {
           marginVertical: ThemeSpacings.sm,
         },
+        headerShown: false,
+        headerShadowVisible: false,
       }}
     >
       <Tab.Screen
         name={HomeTabScreens.Home}
-        component={HomeScreen}
+        component={HomeStack}
         options={{
-          header: props => {
-            return <BottomTabHeader {...props} />;
-          },
-          headerTitle: 'Quick Kode',
           tabBarIcon: ({ color, size }) => (
             <Icon name="Home" color={color} size={size} />
           ),
@@ -34,8 +33,8 @@ export const HomeTabs = () => {
       />
 
       <Tab.Screen
-        name={HomeTabScreens.History}
-        component={USSDCodeScreen}
+        name={HomeTabScreens.USSDCode}
+        component={USSDCodeStack}
         options={{
           tabBarLabel: 'Codes',
           headerTitle: 'USSD Code',
