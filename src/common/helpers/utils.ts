@@ -43,3 +43,9 @@ export const replaceUrlPlaceholders = (
   });
   return modifiedUrl;
 };
+
+export const colorOpacity = (color: string, opacity: number) =>
+  color +
+  Math.round(opacity * 255)
+    .toString(16)
+    .padStart(2, '0');

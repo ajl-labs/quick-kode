@@ -19,7 +19,7 @@ export const DEFAULT_USSD_CODE_CONFIG: Record<
   '*182*8*1*{{paymentCode}}*{{amount}}#': {
     code: '*182*8*1*{{paymentCode}}*{{amount}}#',
     icon: 'CreditCard',
-    description: 'Pay goods/services',
+    description: 'Pay',
     variables: {
       paymentCode: { type: 'text' },
       amount: { type: 'currency' },

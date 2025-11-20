@@ -48,25 +48,19 @@ declare global {
     totalTransactions: number | null;
     totalFees: number | null;
   }
-  interface IMonthlyStats {
-    month: string;
-    total_amount: number;
-    total_fees: number;
-  }
-
-  interface ISpendingByCategory {
+  interface ITransactionTrend {
     label: string;
     total_amount: number;
     total_fees: number;
+    total_transactions: string | number;
   }
+
   interface ITransactionStatsTrends {
-    monthlySpending: IMonthlyStats[];
-    spendingByCategory: ISpendingByCategory[];
+    spendingByPeriod: ITransactionTrend[];
+    spendingByCategory: ITransactionTrend[];
   }
 
   interface IStatCardPayload {
-    labels: string[];
-    data: number[];
-    key: 'spendingByCategory' | 'monthlySpending';
+    key: 'spendingByCategory' | 'spendingByPeriod';
   }
 }

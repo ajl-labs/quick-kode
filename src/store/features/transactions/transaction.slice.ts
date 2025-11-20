@@ -9,6 +9,10 @@ import {
 } from './transaction.thunk';
 import { formatDate } from '../../../common/helpers/date.helpers';
 import { startCase } from 'lodash';
+import { ProgressChartData } from 'react-native-chart-kit/dist/ProgressChart';
+import { StackedBarChartData } from 'react-native-chart-kit/dist/StackedBarChart';
+import { LineChartData } from 'react-native-chart-kit/dist/line-chart/LineChart';
+import { ChartData } from 'react-native-chart-kit/dist/HelperTypes';
 
 const initialState: {
   transactions: Record<string, IDataBaseRecord<ITransaction>>;
@@ -25,7 +29,7 @@ const initialState: {
       balance: null,
     },
     trends: {
-      monthlySpending: [],
+      spendingByPeriod: [],
       spendingByCategory: [],
     },
   },
@@ -91,7 +95,7 @@ const historySlice = createSlice({
           state,
           action: {
             payload: {
-              monthlySpending: ITransactionStatsTrends['monthlySpending'];
+              spendingByPeriod: ITransactionStatsTrends['spendingByPeriod'];
               spendingByCategory: ITransactionStatsTrends['spendingByCategory'];
             };
             type: string;
@@ -99,8 +103,7 @@ const historySlice = createSlice({
         ) => {
           if (action.payload) {
             state.stats.trends = {
-              ...state.stats.trends,
-              monthlySpending: action.payload.monthlySpending,
+              spendingByPeriod: action.payload.spendingByPeriod,
               spendingByCategory: action.payload.spendingByCategory,
             };
           }
@@ -142,28 +145,62 @@ export const selectTransactionStatsSummary = (state: RootState) =>
 export const selectTransactionStatsTrends = createSelector(
   (state: RootState) => state.transactions.stats.trends,
   trends => {
-    const totalSpending = trends.spendingByCategory?.reduce(
-      (acc, curr) => acc + curr.total_amount,
-      0,
-    );
+    let defaultSpendingByPeriod: IStatCardPayload & LineChartData = {
+      labels: [],
+      datasets: [],
+      key: 'spendingByPeriod',
+      legend: ['Weekly Spending'],
+    };
+
+    let defaultSpendingByCategory: IStatCardPayload & ChartData = {
+      labels: [],
+      datasets: [],
+      key: 'spendingByCategory',
+    };
 
     return {
-      monthlySpending: trends.monthlySpending?.reduce(
-        (acc: IStatCardPayload, curr) => {
-          acc.labels.push(formatDate(curr.month, 'MMM YY'));
-          acc.data.push((curr.total_amount || 0) / 1000);
+      spendingByPeriod:
+        trends.spendingByPeriod?.reduce((acc, curr) => {
+          acc.labels.push(formatDate(curr.label, 'DD-MMM'));
+          acc.datasets[0] = {
+            ...(acc.datasets[0] ?? {}),
+            data: [
+              ...(acc.datasets[0]?.data || []),
+              (curr.total_amount | 0) / 10000,
+            ],
+          };
+          // acc.datasets[1] = {
+          //   ...(acc.datasets[1] ?? {}),
+          //   data: [
+          //     ...(acc.datasets[1]?.data || []),
+          //     (curr.total_fees || 0) / 1000,
+          //   ],
+          // };
           return acc;
-        },
-        { labels: [], data: [], key: 'monthlySpending' },
-      ) || { labels: [], data: [], key: 'monthlySpending' },
-      spendingByCategory: trends.spendingByCategory?.reduce(
-        (acc: IStatCardPayload, curr) => {
-          acc.labels.push(startCase(curr.label || 'Uknown'));
-          acc.data.push((curr.total_amount || 0) / totalSpending);
+        }, defaultSpendingByPeriod) || defaultSpendingByPeriod,
+      spendingByCategory:
+        trends.spendingByCategory?.reduce((acc, curr) => {
+          acc.labels = [
+            ...(acc.labels || []),
+            startCase(curr.label || 'Uknown'),
+          ];
+          acc.datasets[0] = {
+            ...(acc.datasets[0] ?? {}),
+            data: [
+              ...(acc.datasets[0]?.data || []),
+              (curr.total_amount || 0) / 1000,
+            ],
+          };
+          // acc.datasets[1] = {
+          //   //color: () => '#ffa726',
+          //   ...(acc.datasets[1] ?? {}),
+          //   data: [
+          //     ...(acc.datasets[1]?.data || []),
+          //     parseInt(curr.total_transactions.toString()),
+          //   ],
+          // };
           return acc;
-        },
-        { labels: [], data: [], key: 'spendingByCategory' },
-      ) || { labels: [], data: [], key: 'monthlySpending' },
+        }, defaultSpendingByCategory) || defaultSpendingByCategory,
     };
   },
 );
