@@ -113,7 +113,7 @@ export const USSDCodeScreen = () => {
               icon={props => (
                 <Icon
                   {...props}
-                  name="DialPad"
+                  name={item.icon || 'DialPad'}
                   color={item.isFavorite ? theme.colors.primary : props.color}
                 />
               )}

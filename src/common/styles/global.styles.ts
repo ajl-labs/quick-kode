@@ -54,11 +54,22 @@ export default StyleSheet.create({
     paddingHorizontal: ThemeSpacings.md,
   },
   horizontalSpacingSm: { paddingHorizontal: ThemeSpacings.sm },
-
   verticalSpacing: {
     paddingVertical: ThemeSpacings.md,
   },
   verticalSpacingSm: { paddingVertical: ThemeSpacings.sm },
+  verticalMargin: {
+    marginVertical: ThemeSpacings.md,
+  },
+  verticalMarginSm: {
+    marginVertical: ThemeSpacings.sm,
+  },
+  horizontalMargin: {
+    marginHorizontal: ThemeSpacings.md,
+  },
+  horizontalMarginSm: {
+    marginHorizontal: ThemeSpacings.sm,
+  },
   noSpacing: {
     paddingVertical: 0,
     paddingHorizontal: 0,

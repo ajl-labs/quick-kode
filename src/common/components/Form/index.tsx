@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {
-  Button,
   ButtonProps,
   Modal,
   Portal,
@@ -22,6 +21,7 @@ import { ThemeSpacings } from '../../../config/theme';
 import { NumberInput } from '../Input/NumberInput';
 import { CheckBox } from '../CheckBox';
 import globalStyles from '../../styles/global.styles';
+import { CustomButton } from '../CustomButton';
 
 const styles = StyleSheet.create({
   container: {
@@ -210,7 +210,7 @@ export const FormButton: React.FC<FormButtonProps> = ({
   ...props
 }) => {
   return (
-    <Button
+    <CustomButton
       mode={mode}
       onPress={onPress}
       icon={props =>
@@ -220,7 +220,7 @@ export const FormButton: React.FC<FormButtonProps> = ({
       {...props}
     >
       {title}
-    </Button>
+    </CustomButton>
   );
 };
 export default { FormContainer, FormInput, FormButton, SelectorInput };

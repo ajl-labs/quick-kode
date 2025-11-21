@@ -1,11 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  Button,
-  Divider,
-  IconButton,
-  Text,
-  useTheme,
-} from 'react-native-paper';
+import { useRef, useState } from 'react';
+import { Divider, IconButton, Text, useTheme } from 'react-native-paper';
 import { useIsFocused } from '@react-navigation/native';
 import { Alert, FlatList, TouchableOpacity, View } from 'react-native';
 import { Container } from '../../common/Container';
@@ -34,6 +28,7 @@ import { Swipeable } from '../../common/components/Swipeable';
 import webhookActionMap, {
   WEBHOOK_ACTIONS_KEY,
 } from '../../common/constants/webhook.actions';
+import { CustomButton } from '../../common/components/CustomButton';
 
 export const WebhookSettings = () => {
   const isFocused = useIsFocused();
@@ -175,20 +170,20 @@ export const WebhookSettings = () => {
       </View>
       {!webhooksList.length && (
         <View style={[globalStyles.row, globalStyles.gap]}>
-          <Button
+          <CustomButton
             mode="contained"
             icon={props => <Icon {...props} name="Add" />}
             onPress={() => handleOpenSheet('webhook')}
           >
             Webhook
-          </Button>
-          <Button
+          </CustomButton>
+          <CustomButton
             mode="outlined"
             icon={props => <Icon {...props} name="Settings" />}
             onPress={() => handleOpenSheet('webhook-auth')}
           >
             Webhook Config
-          </Button>
+          </CustomButton>
         </View>
       )}
     </Container>

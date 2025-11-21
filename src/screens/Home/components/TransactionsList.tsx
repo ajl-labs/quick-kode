@@ -25,6 +25,8 @@ import {
   CustomBottomSheet,
   CustomBottomSheetHandles,
 } from '../../../common/components/CustomBottomSheet';
+import { CustomButton } from '../../../common/components/CustomButton';
+import { CustomChip } from '../../../common/components/CustomChip';
 
 interface TransactionsListProps
   extends Partial<FlatListPropsWithLayout<IDataBaseRecord<ITransaction>>> {
@@ -78,13 +80,13 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
         <View style={globalStyles.spacedRow}>
           {title && <Text variant="titleMedium">{title}</Text>}
           {onViewAllPress && (
-            <Button
+            <CustomButton
               mode="text"
               style={globalStyles.horizontalSpacing}
               onPress={onViewAllPress}
             >
               View All
-            </Button>
+            </CustomButton>
           )}
         </View>
       );
@@ -136,13 +138,14 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
           >
             {Object.values(transactionLabels).map(label => {
               return (
-                <Chip
+                <CustomChip
                   key={label.name}
-                  icon={() =>
+                  label={label.name}
+                  icon={
                     to_snake_case(selectedTransaction?.label || '') ===
-                    to_snake_case(label.name) ? (
-                      <Icon name="Check" color={theme.colors.primary} />
-                    ) : null
+                    to_snake_case(label.name)
+                      ? 'Check'
+                      : null
                   }
                   onPress={() => {
                     setShowLabelDialog(false);
@@ -150,9 +153,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({
                       handleAddLabelToTransaction(label.name);
                     }
                   }}
-                >
-                  {label.name}
-                </Chip>
+                />
               );
             })}
           </View>

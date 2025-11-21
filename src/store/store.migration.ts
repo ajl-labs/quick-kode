@@ -57,9 +57,20 @@ const storeMigration = {
             balance: null,
           },
           trends: {
-            monthlySpending: [],
+            spendingByPeriod: [],
             spendingByCategory: [],
           },
+        },
+      },
+    };
+  },
+  6: (state: RootState): RootState => {
+    return {
+      ...state,
+      transactions: {
+        ...state.transactions,
+        pagination: {
+          limit: 25,
         },
       },
     };

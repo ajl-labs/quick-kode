@@ -17,6 +17,7 @@ import {
   removePendingBackgroundTransaction,
 } from '../../../service/background.transaction';
 import { updateTransactionState } from './transaction.slice';
+import { isEmpty } from '../../../common/helpers';
 
 export const postTransactionData = createAsyncThunk(
   'history/postTransactionData',
@@ -113,17 +114,18 @@ export const postPendingTransactions = createAsyncThunk(
 
 export const fetchTransactionData = createAsyncThunk(
   'history/fetchTransactionData',
-  async (_, { getState }) => {
+  async (queryParams: IPaginatedFetchParams, { getState }) => {
     try {
+      console.log('Fetching transaction data from webhook...', queryParams);
       const { webhookAuth, webhooks } = (getState() as RootState).settings;
-      const { url } = webhooks[WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT] || {};
+      let { url } = webhooks[WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT] || {};
       if (!url) return;
       const { data: responseData } = await axios.get(url.trim(), {
         auth: webhookAuth,
+        params: queryParams,
       });
       return responseData;
     } catch (error) {
-      console.log('failed to fetch transaction data from webhook', error);
       if (isAxiosError(error)) {
         console.log(error.response);
       }

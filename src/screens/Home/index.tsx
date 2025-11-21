@@ -13,11 +13,17 @@ import { useNavigation } from '@react-navigation/native';
 import { HomeStackScreens } from '../../navigation/navigation.constants';
 import {
   selectRecentTransactions,
+  selectTransactionPagination,
   selectTransactionStatsSummary,
 } from '../../store/features/transactions/transaction.slice';
-import { fetchTransactionStatsSummary } from '../../store/features/transactions/transaction.thunk';
+import {
+  fetchTransactionData,
+  fetchTransactionStatsSummary,
+} from '../../store/features/transactions/transaction.thunk';
 import { AppDispatch } from '../../store';
 import { HomeStatsTrends } from './components/HomeStatsTrends';
+import { useFetchList } from '../../common/hooks/useFetch';
+import { CustomButton } from '../../common/components/CustomButton';
 
 const styles = StyleSheet.create({
   quickActionContainer: {
@@ -28,8 +34,8 @@ const styles = StyleSheet.create({
   statSection: {
     ...globalStyles.row,
     flexWrap: 'wrap',
-    rowGap: ThemeSpacings.sm,
-    columnGap: ThemeSpacings.sm,
+    rowGap: ThemeSpacings.md,
+    columnGap: ThemeSpacings.md,
   },
 });
 
@@ -37,7 +43,20 @@ export const HomeScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation();
 
-  const transactions = useSelector(selectRecentTransactions);
+  const {
+    data: transactions,
+    isLoading,
+    isRefreshing,
+    onRefresh,
+  } = useFetchList({
+    dataSelector: selectRecentTransactions,
+    dataFetcher: fetchTransactionData,
+    paginationSelector: selectTransactionPagination,
+    queryParams: {
+      limit: 25,
+    },
+  });
+
   const transactionStats = useSelector(selectTransactionStatsSummary);
 
   useEffect(() => {
@@ -48,12 +67,14 @@ export const HomeScreen = () => {
     <Container style={globalStyles.noSpacing}>
       <TransactionsList
         data={transactions}
+        refreshing={isRefreshing}
+        onRefresh={onRefresh}
         title="Recent Transactions"
         ListHeaderComponent={
           <View
             style={[
               globalStyles.column,
-              globalStyles.gapSm,
+              globalStyles.gap,
               globalStyles.fullWidth,
             ]}
           >
@@ -72,19 +93,18 @@ export const HomeScreen = () => {
             <HomeQuickActions style={styles.quickActionContainer} />
             <View style={[globalStyles.spacedRow, globalStyles.fullWidth]}>
               <Text variant="titleMedium">Recent Transactions</Text>
-              <Button
+              <CustomButton
                 mode="text"
-                style={globalStyles.horizontalSpacing}
                 onPress={() =>
                   navigation.navigate(HomeStackScreens.AllTransactions)
                 }
               >
                 View All
-              </Button>
+              </CustomButton>
             </View>
           </View>
         }
-        style={[globalStyles.horizontalSpacingSm]}
+        style={[globalStyles.horizontalSpacing]}
       />
     </Container>
   );

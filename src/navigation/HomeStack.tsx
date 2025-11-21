@@ -4,7 +4,8 @@ import { AllTransactions } from '../screens/AllTransactions';
 import { HomeStackParamList } from './types';
 import { HomeStackScreens } from './navigation.constants';
 import { HomeScreen } from '../screens';
-import { HomeScreenHeader } from '../common/components/Header/ScreenHeader';
+import { HomeScreenHeader } from '../common/components/Header/HomeScreenHeader';
+import { CustomAppHeader } from '../common/components/Header/CustomAppHeader';
 
 const Stack = createNativeStackNavigator<HomeStackParamList>();
 
@@ -15,6 +16,7 @@ export const HomeStack = () => {
       screenOptions={{
         animation: 'slide_from_right',
         headerShadowVisible: false,
+        header: props => <CustomAppHeader {...props} />,
       }}
     >
       <Stack.Screen
@@ -28,7 +30,13 @@ export const HomeStack = () => {
       <Stack.Screen
         name={HomeStackScreens.AllTransactions}
         component={AllTransactions}
-        options={{ presentation: 'modal', title: 'All Transactions' }} // Modal presentation for this screen
+        options={{
+          title: 'All Transactions',
+          presentation: 'containedModal',
+          headerSearchBarOptions: {
+            placeholder: 'Search',
+          },
+        }}
       />
     </Stack.Navigator>
   );

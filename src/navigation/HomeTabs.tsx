@@ -8,6 +8,7 @@ import { HomeTabParamList } from './types';
 import { SettingsStack } from './SettingsStack';
 import { HomeStack } from './HomeStack';
 import { USSDCodeStack } from './USSDCodeStack';
+import { CustomAppHeader } from '../common/components/Header/CustomAppHeader';
 
 const Tab = createBottomTabNavigator<HomeTabParamList>();
 

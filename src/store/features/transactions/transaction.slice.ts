@@ -16,12 +16,16 @@ import { ChartData } from 'react-native-chart-kit/dist/HelperTypes';
 
 const initialState: {
   transactions: Record<string, IDataBaseRecord<ITransaction>>;
+  pagination: IPagination;
   stats: {
     summary: ITransactionStatsSummary;
     trends: ITransactionStatsTrends;
   };
 } = {
   transactions: {},
+  pagination: {
+    limit: 25,
+  },
   stats: {
     summary: {
       totalTransactions: null,
@@ -64,12 +68,25 @@ const historySlice = createSlice({
       })
       .addCase(fetchTransactionData.fulfilled, (state, action) => {
         if (action.payload) {
-          const { data } = action.payload as PaginatedResponse<ITransaction>;
+          const { data, nextCursor, currentCursor } =
+            action.payload as PaginatedResponse<ITransaction>;
           if (data && Array.isArray(data)) {
-            state.transactions = data.reduce((acc, transaction) => {
-              acc[transaction.id] = transaction;
-              return acc;
-            }, {} as Record<string, IDataBaseRecord<ITransaction>>);
+            if (!currentCursor) {
+              state.transactions = data.reduce((acc, transaction) => {
+                acc[transaction.id] = transaction;
+                return acc;
+              }, {} as Record<string, IDataBaseRecord<ITransaction>>);
+            } else {
+              state.transactions = {
+                ...state.transactions,
+                ...data.reduce((acc, transaction) => {
+                  acc[transaction.id] = transaction;
+                  return acc;
+                }, {} as Record<string, IDataBaseRecord<ITransaction>>),
+              };
+            }
+            state.pagination['nextCursor'] = nextCursor || null;
+            state.pagination['currentCursor'] = currentCursor || null;
           }
         }
       })
@@ -204,3 +221,6 @@ export const selectTransactionStatsTrends = createSelector(
     };
   },
 );
+
+export const selectTransactionPagination = (state: RootState) =>
+  state.transactions.pagination;

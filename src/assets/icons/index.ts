@@ -36,6 +36,7 @@ import Hash from './hash.svg';
 import DialPad from './dial-pad.svg';
 import AddBookmark from './add-bookmark.svg';
 import Bookmark from './bookmark.svg';
+import Search from './search.svg';
 
 export const icons = {
   ArrowTopRight,
@@ -75,4 +76,5 @@ export const icons = {
   DialPad,
   AddBookmark,
   Bookmark,
+  Search,
 };

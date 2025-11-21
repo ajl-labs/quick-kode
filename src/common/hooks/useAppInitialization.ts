@@ -2,10 +2,7 @@ import { useEffect, useRef } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { retryPostTransactions } from '../../store/features/retryQueue/retry.queue.thunk';
-import {
-  fetchTransactionData,
-  postPendingTransactions,
-} from '../../store/features/transactions/transaction.thunk';
+import { postPendingTransactions } from '../../store/features/transactions/transaction.thunk';
 import { AppDispatch } from '../../store';
 import { showAndroidToast } from '../helpers/utils';
 
@@ -25,7 +22,6 @@ export const useAppInitialization = () => {
             showAndroidToast(res.reason.message);
           }
         });
-        await dispatch(fetchTransactionData());
       } catch (error) {
         showAndroidToast((error as Error).message);
       }

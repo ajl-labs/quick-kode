@@ -27,7 +27,13 @@ export const lightTheme: MD3Theme = {
   ...MD3LightTheme,
   colors: {
     ...MD3LightTheme.colors,
-    primary: '#764abc', //  purple for primary actions
+    primary: '#611ef2',
+    primaryContainer: '#d5c2fa',
+    inversePrimary: '#5319ec',
+
+    secondary: '#f2611e',
+    secondaryContainer: '#fbcdbb',
+    //checkout this: https://m2.material.io/inline-tools/color/
   },
   fonts: responsiveFonts,
   roundness: moderateScale(4),
@@ -40,19 +46,12 @@ export const darkTheme: MD3Theme = {
     ...MD3DarkTheme.colors,
     primary: '#aff21e',
     primaryContainer: '#d7fb9b',
-    onPrimary: '#e7fcc3',
     inversePrimary: '#baf54c',
 
-    // primary100: '#f5fee7',
-    // primary90: '#e7fcc3',
-    // primary80: '#d7fb9b',
-    // primary70: '#c7f870',
-    // primary60: '#baf54c',
-    // primary50: '#aff21e', // the base color
-    // primary40: '#a5df11',
-    // primary30: '#97c800',
-    // primary20: '#8bb000',
-    // primary10: '#768800',
+    secondary: '#1ef261',
+    secondaryContainer: '#e9feea',
+
+    // checkout this: https://m2.material.io/inline-tools/color/
   },
   fonts: responsiveFonts,
   roundness: moderateScale(4),

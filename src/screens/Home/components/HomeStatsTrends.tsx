@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Dimensions } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import globalStyles from '../../../common/styles/global.styles';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +7,7 @@ import { fetchTransactionStatsTrends } from '../../../store/features/transaction
 import { AppDispatch } from '../../../store';
 import { selectTransactionStatsTrends } from '../../../store/features/transactions/transaction.slice';
 import { BarChart, LineChart } from 'react-native-chart-kit';
-import { ThemeSpacings } from '../../../config/theme';
+import { darkTheme, ThemeSpacings } from '../../../config/theme';
 import { moderateScale } from 'react-native-size-matters';
 import ReAnimated from 'react-native-reanimated';
 import { LineChartData } from 'react-native-chart-kit/dist/line-chart/LineChart';
@@ -16,8 +16,9 @@ import { StackedBarChartData } from 'react-native-chart-kit/dist/StackedBarChart
 import { ChartData } from 'react-native-chart-kit/dist/HelperTypes';
 import { colorOpacity } from '../../../common/helpers/utils';
 
-const STATS_CARD_HEIGTH = moderateScale(200);
-const STATS_CARD_WIDTH = Dimensions.get('window').width - ThemeSpacings.sm * 2;
+const STATS_CARD_CONTAINER_HEIGHT = moderateScale(200);
+const STATS_CARD_HEIGTH = moderateScale(175);
+const STATS_CARD_WIDTH = Dimensions.get('window').width * 0.92;
 
 interface HomeStatsTrendsProps {}
 
@@ -77,9 +78,7 @@ export const HomeStatsTrends: React.FC<HomeStatsTrendsProps> = () => {
             yAxisSuffix="k"
             chartConfig={chartConfig}
             bezier
-            style={{
-              borderRadius: theme.roundness,
-            }}
+            style={styles.statsChartContainer}
           />
         );
       case 'spendingByCategory':
@@ -87,7 +86,7 @@ export const HomeStatsTrends: React.FC<HomeStatsTrendsProps> = () => {
           <BarChart
             data={restOfData as ChartData}
             width={STATS_CARD_WIDTH}
-            height={STATS_CARD_HEIGTH}
+            height={STATS_CARD_CONTAINER_HEIGHT}
             yAxisLabel="Rw"
             yAxisSuffix="k"
             chartConfig={{
@@ -96,10 +95,14 @@ export const HomeStatsTrends: React.FC<HomeStatsTrendsProps> = () => {
                 colorOpacity(theme.colors.secondary, opacity),
               labelColor: (opacity = 1) =>
                 colorOpacity(theme.colors.secondary, opacity),
+              barPercentage: 0.5,
             }}
             style={{
-              borderRadius: theme.roundness,
+              ...styles.statsChartContainer,
+              height: STATS_CARD_CONTAINER_HEIGHT,
             }}
+            showValuesOnTopOfBars
+            yLabelsOffset={25}
           />
         );
 
@@ -117,7 +120,7 @@ export const HomeStatsTrends: React.FC<HomeStatsTrendsProps> = () => {
       ]}
       horizontal={true}
       renderItem={renderItem}
-      contentContainerStyle={[globalStyles.gap, globalStyles.centered]}
+      contentContainerStyle={[globalStyles.gapSm, globalStyles.centered]}
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
       keyExtractor={item => item.key}
@@ -127,3 +130,11 @@ export const HomeStatsTrends: React.FC<HomeStatsTrendsProps> = () => {
     />
   );
 };
+
+const styles = StyleSheet.create({
+  statsChartContainer: {
+    borderRadius: darkTheme.roundness,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

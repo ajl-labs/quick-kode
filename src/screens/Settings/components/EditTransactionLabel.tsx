@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { Chip, Text, TextInput, useTheme } from 'react-native-paper';
+import {
+  Chip,
+  Text,
+  TextInput,
+  TouchableRipple,
+  useTheme,
+} from 'react-native-paper';
 import { Icon } from '../../../common/components';
 import globalStyles from '../../../common/styles/global.styles';
 import { ThemeSpacings } from '../../../config/theme';
@@ -10,6 +16,9 @@ import {
   removeTransactionLabel,
   selectTransactionLabels,
 } from '../../../store/features/settings/settings.slice';
+import { moderateScale } from 'react-native-size-matters';
+import { startCase } from 'lodash';
+import { CustomChip } from '../../../common/components/CustomChip';
 
 export const EditTransactionLabel = () => {
   const theme = useTheme();
@@ -59,18 +68,12 @@ export const EditTransactionLabel = () => {
       >
         {Object.values(transactionLabels).map(label => {
           return (
-            <Chip
-              closeIcon={props => (
-                <Icon {...props} name="Close" color={theme.colors.onSurface} />
-              )}
-              onLongPress={() => console.log('Pressed')}
+            <CustomChip
               key={label.name}
-              style={{ position: 'relative' }}
-              onClose={() => handleChipClose(label.name)}
-              mode="outlined"
-            >
-              {label.name}
-            </Chip>
+              label={startCase(label.name)}
+              onPress={() => handleChipClose(label.name)}
+              closable
+            />
           );
         })}
       </View>

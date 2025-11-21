@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { USSDCodeStackScreens } from './navigation.constants';
 import { USSDCodeScreen } from '../screens';
+import { CustomAppHeader } from '../common/components/Header/CustomAppHeader';
 
 const Stack = createNativeStackNavigator();
 
@@ -11,6 +12,7 @@ export const USSDCodeStack = () => {
       screenOptions={{
         animation: 'slide_from_right',
         headerShadowVisible: false,
+        header: props => <CustomAppHeader {...props} />,
       }}
     >
       <Stack.Screen
