@@ -18,7 +18,7 @@ export const QuickAction: React.FC<QuickActionProps> = ({
       mode="outlined"
       icon={iconProps => {
         if (icon) {
-          return <Icon name={icon} color={iconProps.color} />;
+          return <Icon name={icon} color={iconProps.color} size={20} />;
         }
       }}
     >

@@ -183,7 +183,7 @@ export const selectTransactionStatsTrends = createSelector(
             ...(acc.datasets[0] ?? {}),
             data: [
               ...(acc.datasets[0]?.data || []),
-              (curr.total_amount | 0) / 10000,
+              (curr.total_amount | 0) / 1000,
             ],
           };
           // acc.datasets[1] = {

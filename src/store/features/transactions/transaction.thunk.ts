@@ -58,7 +58,8 @@ export const postTransactionData = createAsyncThunk(
         : (error as Error).message;
       if (
         axiosError &&
-        error.response?.data.code === 'INVALID_TRANSACTION_MESSAGE'
+        (error.response?.data.code === 'INVALID_TRANSACTION_MESSAGE' ||
+          error.response?.status === 409) // omit retyring duplicate transactions
       ) {
         dispatch(
           removePostTransactionRequest({ key: transactionData.messageId }),

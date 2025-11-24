@@ -60,7 +60,7 @@ class SmsReceiver : BroadcastReceiver() {
             val isMMoney = listOf(sender, displayOriginatingAddress)
                 .any { it?.lowercase()?.contains("m-money".lowercase()) == true || it == "6505551212" }
             // Check if it is a transaction message (contains "RWF")
-            val isTransactionMessage = message.lowercase().contains("rwf")
+            val isTransactionMessage = message.lowercase().contains("rwf") && !message.lowercase().contains("failed")
 
             if (processedMessages.contains(messageId) || !isMMoney || !isTransactionMessage) {
                 Log.d("SmsReceiver", "Event stopped: Duplicate or M-Money message")

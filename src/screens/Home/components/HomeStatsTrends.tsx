@@ -79,6 +79,8 @@ export const HomeStatsTrends: React.FC<HomeStatsTrendsProps> = () => {
             chartConfig={chartConfig}
             bezier
             style={styles.statsChartContainer}
+            verticalLabelRotation={-60}
+            onDataPointClick={props => console.log(props)}
           />
         );
       case 'spendingByCategory':
@@ -101,6 +103,8 @@ export const HomeStatsTrends: React.FC<HomeStatsTrendsProps> = () => {
               ...styles.statsChartContainer,
               height: STATS_CARD_CONTAINER_HEIGHT,
             }}
+            verticalLabelRotation={-60}
+            xLabelsOffset={8}
             showValuesOnTopOfBars
             yLabelsOffset={25}
           />
