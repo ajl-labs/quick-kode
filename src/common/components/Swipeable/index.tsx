@@ -11,6 +11,7 @@ import Reanimated, {
   SharedValue,
   useAnimatedStyle,
 } from 'react-native-reanimated';
+import globalStyles from '../../styles/global.styles';
 
 interface RightActionProps {
   progress: SharedValue<number>;
@@ -30,12 +31,25 @@ const RightAction: React.FC<RightActionProps> = ({
 }) => {
   const styleAnimation = useAnimatedStyle(() => {
     return {
-      transform: [{ translateX: drag.value + 50 }],
+      transform: [
+        {
+          translateX: drag.value + 70,
+        },
+      ],
+      opacity: progress.value,
     };
   });
+
   if (!rightAction) return null;
   return (
-    <Reanimated.View style={[styles.rightAction, styleAnimation]}>
+    <Reanimated.View
+      style={[
+        styles.rightAction,
+        globalStyles.row,
+        styleAnimation,
+        { backgroundColor: 'yellow' },
+      ]}
+    >
       {rightAction}
     </Reanimated.View>
   );

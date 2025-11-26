@@ -1,4 +1,10 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useImperativeHandle,
+} from 'react';
 import { StyleSheet } from 'react-native';
 import { AnimatedFAB, useTheme } from 'react-native-paper';
 import { moderateScale } from 'react-native-size-matters';
@@ -12,12 +18,13 @@ import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  addCode,
+  setUssdCode,
   selectAllUSSDCodesObject,
 } from '../../../store/features/ussdCode/ussd.code.slice';
 import { extractUSSDFormVariable } from '../../../common/helpers';
 import { debounce, startCase } from 'lodash';
 import { USSDHandlerFormInputTypes } from '../../../common/constants';
+import { isPending } from '@reduxjs/toolkit';
 
 const validationSchema = Yup.object().shape({
   code: Yup.string()
@@ -28,30 +35,64 @@ const validationSchema = Yup.object().shape({
     ),
   description: Yup.string().required('Description is required'),
   variables: Yup.object().shape({}),
+  isEdit: Yup.boolean().optional(),
 });
 
-export const NewCodeForm = () => {
+export interface UssdCodeFormHandlers {
+  open: (item: IUSSDCodeData) => void;
+  close: () => void;
+}
+interface UssdCodeFormProps {}
+export const UssdCodeForm = React.forwardRef<
+  UssdCodeFormHandlers,
+  UssdCodeFormProps
+>((_, ref) => {
   const theme = useTheme();
   const bottomSheetRef = useRef<CustomBottomSheetHandles>(null);
   const dispatch = useDispatch();
   const allUSSDCodes = useSelector(selectAllUSSDCodesObject);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [variables, setVariables] = useState<string[]>([]);
+  const [initialValues, setInitialValues] = useState<
+    IUSSDCodeData & { isEdit?: boolean }
+  >({
+    code: '',
+    description: '',
+    variables: {},
+    isEdit: false,
+  });
+
+  useImperativeHandle(ref, () => ({
+    open: (item: IUSSDCodeData) => {
+      setInitialValues({
+        code: item.code,
+        description: item.description,
+        variables: item.variables,
+        isEdit: true,
+      });
+      setVariables(Object.keys(item.variables || {}));
+      bottomSheetRef.current?.present();
+    },
+    close: () => bottomSheetRef.current?.dismiss(),
+  }));
+
   const form = useFormik({
-    initialValues: { code: '', description: '', variables: {} },
+    initialValues,
     validationSchema,
+    enableReinitialize: true,
     onSubmit: (values: {
       code: string;
       description: string;
       variables: IUSSDCodeData['variables'];
+      isEdit?: boolean;
     }) => {
       const transformedValue = validationSchema.cast(values);
-      if (allUSSDCodes[transformedValue.code]) {
+      if (allUSSDCodes[transformedValue.code] && !values.isEdit) {
         form.setFieldError('code', 'This USSD code already exists.');
         return;
       }
       dispatch(
-        addCode({
+        setUssdCode({
           code: transformedValue.code,
           description: transformedValue.description,
           variables: transformedValue.variables,
@@ -144,7 +185,7 @@ export const NewCodeForm = () => {
       />
     </>
   );
-};
+});
 
 const styles = StyleSheet.create({
   fabStyle: {

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   FlatList,
@@ -15,17 +15,17 @@ import {
   toogleCodeFavorite,
 } from '../../store/features/ussdCode/ussd.code.slice';
 import { Icon } from '../../common/components';
-import { NewCodeForm } from './components/NewCodeForm';
+import { UssdCodeForm, UssdCodeFormHandlers } from './components/UssdCodeForm';
 import { Swipeable, GHSwipeable } from '../../common/components/Swipeable';
 import { useUSSDCodeHandler } from '../../common/hooks/useUSSDCodeHandler';
 import { moderateScale } from 'react-native-size-matters';
 
 export const USSDCodeScreen = () => {
+  const ussdCodeFormRef = useRef<UssdCodeFormHandlers>(null);
   const swipeableRef = useRef<GHSwipeable>(null);
   const dispatch = useDispatch();
   const theme = useTheme();
   const { openUSSSHandlerForm } = useUSSDCodeHandler();
-
   const USSDCodes = useSelector(selectAllUSSDCodes);
 
   const toogleFavorite = (codeConfig: IUSSDCodeData, isFavorite: boolean) => {
@@ -81,18 +81,33 @@ export const USSDCodeScreen = () => {
       ],
     );
   };
+
+  const openEditUssdCode = (code: IUSSDCodeData) => {
+    swipeableRef.current?.close();
+    ussdCodeFormRef.current?.open(code);
+  };
+
   const _renderItem = ({ item }: { item: IUSSDCodeData }) => {
     return (
       <Swipeable
         ref={swipeableRef}
         rightAction={
-          <IconButton
-            icon={props => <Icon name="Delete" {...props} />}
-            onPress={deleteCodeAlert.bind(null, item.code)}
-            containerColor={`${theme.colors.error}`}
-            iconColor={theme.colors.background}
-            style={[globalStyles.noRadius, { height: '100%' }]}
-          />
+          <>
+            <IconButton
+              icon={props => <Icon name="Edit" {...props} />}
+              onPress={openEditUssdCode.bind(null, item)}
+              containerColor={theme.colors.primary}
+              iconColor={theme.colors.onPrimary}
+              style={[globalStyles.noRadius, { margin: 0 }]}
+            />
+            <IconButton
+              icon={props => <Icon name="Delete" {...props} />}
+              onPress={deleteCodeAlert.bind(null, item.code)}
+              containerColor={theme.colors.error}
+              iconColor={theme.colors.background}
+              style={[globalStyles.noRadius, { margin: 0 }]}
+            />
+          </>
         }
       >
         <TouchableOpacity
@@ -144,7 +159,7 @@ export const USSDCodeScreen = () => {
         keyExtractor={item => item.code}
         contentContainerStyle={styles.listContentContainer}
       />
-      <NewCodeForm />
+      <UssdCodeForm ref={ussdCodeFormRef} />
     </View>
   );
 };

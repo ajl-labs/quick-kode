@@ -79,7 +79,6 @@ export const HomeStatsTrends: React.FC<HomeStatsTrendsProps> = () => {
             chartConfig={chartConfig}
             bezier
             style={styles.statsChartContainer}
-            verticalLabelRotation={-60}
             onDataPointClick={props => console.log(props)}
           />
         );

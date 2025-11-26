@@ -2,6 +2,7 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../..';
 import { IconProps } from '../../../common/components';
 import { DEFAULT_USSD_CODE_CONFIG } from '../../../common/constants/default.state';
+import { pick } from 'lodash';
 
 interface USSDCodeStateType {
   codes: Record<string, IUSSDCodeData & { icon?: IconProps['name'] }>;
@@ -15,15 +16,18 @@ const ussdCodeSlice = createSlice({
   name: 'ussdCode',
   initialState,
   reducers: {
-    addCode(
+    setUssdCode(
       state,
       action: {
         type: string;
         payload: Pick<IUSSDCodeData, 'code' | 'description' | 'variables'>;
       },
     ) {
-      const { code, description, variables } = action.payload;
-      state.codes[code] = { code, description, variables };
+      const { code } = action.payload;
+      state.codes[code] = {
+        ...(state.codes[code] || {}),
+        ...pick(action.payload, ['code', 'description', 'variables']),
+      };
     },
 
     removeCode(state, action: { type: string; payload: { code: string } }) {
@@ -54,7 +58,7 @@ const ussdCodeSlice = createSlice({
 });
 
 const { actions, reducer } = ussdCodeSlice;
-export const { addCode, removeCode, toogleCodeFavorite, addUsedCount } =
+export const { setUssdCode, removeCode, toogleCodeFavorite, addUsedCount } =
   actions;
 
 export default reducer;
