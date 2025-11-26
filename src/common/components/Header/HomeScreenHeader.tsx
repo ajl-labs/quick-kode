@@ -63,7 +63,7 @@ export const HomeScreenHeader: React.FC<NativeStackHeaderProps> = props => {
     dispatch(setReportDateRange({ months }));
     setTimeout(() => {
       setIsMenuOpen(false);
-    }, 500);
+    }, 300);
   };
 
   useEffect(() => {
@@ -150,7 +150,7 @@ export const HomeScreenHeader: React.FC<NativeStackHeaderProps> = props => {
                       dispatch(setReportGranularity(item));
                       setTimeout(() => {
                         setIsMenuOpen(false);
-                      }, 500);
+                      }, 300);
                     }}
                     key={item}
                   >

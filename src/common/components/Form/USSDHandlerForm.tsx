@@ -1,4 +1,4 @@
-import { Alert, PermissionsAndroid, Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { Text } from 'react-native-paper';
 import Form from './index';
 import { useMemo, useRef, useState } from 'react';
@@ -48,10 +48,10 @@ export const USSDHandlerForm: React.FC<USSDHandlerFormProps> = ({
 
   const pickContact = async (variableName: string) => {
     const phoneResults = await ContactPicker.pickContact();
-    if (phoneResults.name) {
+    if (phoneResults?.name) {
       setLabels(prev => ({ ...prev, [variableName]: phoneResults.name }));
     }
-    if (phoneResults.phoneNumber) {
+    if (phoneResults?.phoneNumber) {
       formikRef.current?.setFieldValue(variableName, phoneResults.phoneNumber);
     }
   };
@@ -98,6 +98,8 @@ export const USSDHandlerForm: React.FC<USSDHandlerFormProps> = ({
               extraProps.keyboardType = 'decimal-pad';
               extraProps.isNumberInput = true;
               extraProps.leftIcon = 'Cash';
+            } else if (['number', 'integer'].includes(type)) {
+              extraProps.keyboardType = 'decimal-pad';
             } else if (type === 'phone') {
               extraProps.keyboardType = 'phone-pad';
               extraProps.leftIcon = 'Phone';

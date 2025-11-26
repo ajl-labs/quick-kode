@@ -15,8 +15,6 @@ import { ChartData } from 'react-native-chart-kit/dist/HelperTypes';
 import { colorOpacity } from '../../../common/helpers/utils';
 import { formatMoneyShort } from '../../../common/helpers/currency.helpers';
 import { useFetch } from '../../../common/hooks/useFetch';
-import { useSelector } from 'react-redux';
-import { selectReportGranularity } from '../../../store/features/appConfig/app.config.slice';
 
 const STATS_CARD_CONTAINER_HEIGHT = moderateScale(200);
 const STATS_CARD_HEIGTH = moderateScale(175);
@@ -58,6 +56,13 @@ export const HomeStatsTrends = React.forwardRef<
     );
   }, [transactionTrends]);
 
+  const spendingByPeriodDynamicProps = useMemo(() => {
+    return {
+      verticalLabelRotation:
+        transactionTrends?.spendingByPeriod?.labels?.length >= 7 ? -50 : 0,
+    };
+  }, [transactionTrends]);
+
   const chartConfig: AbstractChartConfig = {
     backgroundColor: theme.colors.surface,
     backgroundGradientFrom: theme.colors.surfaceVariant,
@@ -72,6 +77,9 @@ export const HomeStatsTrends = React.forwardRef<
     },
     propsForLabels: {
       fontSize: moderateScale(8),
+    },
+    style: {
+      backgroundColor: 'yellow',
     },
   };
   const renderItem = ({ item }: { item: IStatsChartData }) => {
@@ -96,6 +104,7 @@ export const HomeStatsTrends = React.forwardRef<
             bezier
             style={styles.statsChartContainer}
             onDataPointClick={props => console.log(props)}
+            {...spendingByPeriodDynamicProps}
           />
         );
       case 'spendingByCategory':
@@ -124,8 +133,6 @@ export const HomeStatsTrends = React.forwardRef<
               ...styles.statsChartContainer,
               height: STATS_CARD_CONTAINER_HEIGHT,
             }}
-            verticalLabelRotation={-80}
-            xLabelsOffset={13}
             showValuesOnTopOfBars
             yLabelsOffset={25}
           />

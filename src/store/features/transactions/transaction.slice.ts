@@ -208,16 +208,19 @@ export const selectTransactionStatsTrends = createSelector(
 
     // Spending by category
     const spendingByCategory =
-      trends.spendingByCategory?.reduce((acc, curr) => {
-        acc.labels.push(startCase(curr.label || 'Unknown').slice(0, 7));
+      [...(trends.spendingByCategory || [])]
+        ?.sort(i => i.total_amount)
+        .slice(0, 8)
+        .reduce((acc, curr) => {
+          acc.labels.push(startCase(curr.label || 'Unknown').slice(0, 10));
 
-        acc.datasets[0] = {
-          ...(acc.datasets[0] ?? {}),
-          data: [...(acc.datasets[0]?.data || []), curr.total_amount || 0],
-        };
+          acc.datasets[0] = {
+            ...(acc.datasets[0] ?? {}),
+            data: [...(acc.datasets[0]?.data || []), curr.total_amount || 0],
+          };
 
-        return acc;
-      }, spendingByCategoryDefault) || spendingByCategoryDefault;
+          return acc;
+        }, spendingByCategoryDefault) || spendingByCategoryDefault;
 
     return { spendingByPeriod, spendingByCategory };
   },
