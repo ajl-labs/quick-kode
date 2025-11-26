@@ -9,10 +9,8 @@ import {
 } from './transaction.thunk';
 import { formatDate } from '../../../common/helpers/date.helpers';
 import { startCase } from 'lodash';
-import { ProgressChartData } from 'react-native-chart-kit/dist/ProgressChart';
-import { StackedBarChartData } from 'react-native-chart-kit/dist/StackedBarChart';
-import { LineChartData } from 'react-native-chart-kit/dist/line-chart/LineChart';
-import { ChartData } from 'react-native-chart-kit/dist/HelperTypes';
+import { TransactionGranularity } from '../../../common/constants';
+import { selectReportGranularity } from '../appConfig/app.config.slice';
 
 const initialState: {
   transactions: Record<string, IDataBaseRecord<ITransaction>>;
@@ -31,6 +29,7 @@ const initialState: {
       totalTransactions: null,
       totalFees: null,
       balance: null,
+      averagespending: null,
     },
     trends: {
       spendingByPeriod: [],
@@ -159,66 +158,68 @@ export const selectRecentTransactions = createSelector(
 export const selectTransactionStatsSummary = (state: RootState) =>
   state.transactions.stats.summary;
 
+export const selectTrends = (state: RootState) =>
+  state.transactions.stats.trends;
+
 export const selectTransactionStatsTrends = createSelector(
-  (state: RootState) => state.transactions.stats.trends,
-  trends => {
-    let defaultSpendingByPeriod: IStatCardPayload & LineChartData = {
+  [selectTrends, selectReportGranularity],
+  (trends, granularity) => {
+    const legendPrefix =
+      granularity === TransactionGranularity.WEEK
+        ? 'Weekly'
+        : granularity === TransactionGranularity.YEAR
+        ? 'Yearly'
+        : 'Monthly';
+    const spendingByPeriodDefault: IStatsChartData = {
       labels: [],
       datasets: [],
       key: 'spendingByPeriod',
-      legend: ['Weekly Spending'],
+      legend: [`${legendPrefix} Spending`],
     };
 
-    let defaultSpendingByCategory: IStatCardPayload & ChartData = {
+    const spendingByCategoryDefault: IStatsChartData = {
       labels: [],
       datasets: [],
       key: 'spendingByCategory',
     };
 
-    return {
-      spendingByPeriod:
-        trends.spendingByPeriod?.reduce((acc, curr) => {
-          acc.labels.push(formatDate(curr.label, 'DD-MMM'));
-          acc.datasets[0] = {
-            ...(acc.datasets[0] ?? {}),
-            data: [
-              ...(acc.datasets[0]?.data || []),
-              (curr.total_amount | 0) / 1000,
-            ],
-          };
-          // acc.datasets[1] = {
-          //   ...(acc.datasets[1] ?? {}),
-          //   data: [
-          //     ...(acc.datasets[1]?.data || []),
-          //     (curr.total_fees || 0) / 1000,
-          //   ],
-          // };
-          return acc;
-        }, defaultSpendingByPeriod) || defaultSpendingByPeriod,
-      spendingByCategory:
-        trends.spendingByCategory?.reduce((acc, curr) => {
-          acc.labels = [
-            ...(acc.labels || []),
-            startCase(curr.label || 'Uknown'),
-          ];
-          acc.datasets[0] = {
-            ...(acc.datasets[0] ?? {}),
-            data: [
-              ...(acc.datasets[0]?.data || []),
-              (curr.total_amount || 0) / 1000,
-            ],
-          };
-          // acc.datasets[1] = {
-          //   //color: () => '#ffa726',
-          //   ...(acc.datasets[1] ?? {}),
-          //   data: [
-          //     ...(acc.datasets[1]?.data || []),
-          //     parseInt(curr.total_transactions.toString()),
-          //   ],
-          // };
-          return acc;
-        }, defaultSpendingByCategory) || defaultSpendingByCategory,
-    };
+    // Pick date format once
+    const dateFormat =
+      granularity === TransactionGranularity.WEEK
+        ? 'week'
+        : granularity === TransactionGranularity.YEAR
+        ? 'YYYY'
+        : 'MMM-YY';
+
+    // Spending by period
+    const spendingByPeriod =
+      trends.spendingByPeriod?.reduce((acc, curr) => {
+        acc.labels.push(formatDate(curr.label, dateFormat));
+
+        const value = (curr.total_amount || 0) / 1000;
+
+        acc.datasets[0] = {
+          ...(acc.datasets[0] ?? {}),
+          data: [...(acc.datasets[0]?.data || []), value],
+        };
+
+        return acc;
+      }, spendingByPeriodDefault) || spendingByPeriodDefault;
+
+    // Spending by category
+    const spendingByCategory =
+      trends.spendingByCategory?.reduce((acc, curr) => {
+        acc.labels.push(startCase(curr.label || 'Unknown').slice(0, 7));
+
+        acc.datasets[0] = {
+          ...(acc.datasets[0] ?? {}),
+          data: [...(acc.datasets[0]?.data || []), curr.total_amount || 0],
+        };
+
+        return acc;
+      }, spendingByCategoryDefault) || spendingByCategoryDefault;
+
+    return { spendingByPeriod, spendingByCategory };
   },
 );
 

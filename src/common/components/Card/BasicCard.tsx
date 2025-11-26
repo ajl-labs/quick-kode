@@ -30,8 +30,8 @@ export const BasicCard: React.FC<BasicCardProps> = ({
         {
           borderColor: theme.colors.outline,
           borderWidth: StyleSheet.hairlineWidth * 2,
-          backgroundColor: theme.colors.surface,
-          borderRadius: theme.roundness * roundness,
+          backgroundColor: theme.colors.elevation.level4,
+          borderRadius: theme.roundness,
         },
         styles.content,
         style,

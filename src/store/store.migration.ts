@@ -1,6 +1,7 @@
 import { RootState } from '.';
 import { omit, pick } from 'lodash';
 import { DEFAULT_USSD_CODE_CONFIG } from '../common/constants/default.state';
+import { TransactionGranularity } from '../common/constants';
 
 // define your migrations
 const storeMigration = {
@@ -71,6 +72,18 @@ const storeMigration = {
         ...state.transactions,
         pagination: {
           limit: 25,
+        },
+      },
+    };
+  },
+  7: (state: RootState): RootState => {
+    return {
+      ...state,
+      config: {
+        ...state.config,
+        report: {
+          granularity: TransactionGranularity.MONTH,
+          months: 3,
         },
       },
     };

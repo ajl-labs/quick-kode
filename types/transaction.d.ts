@@ -1,7 +1,10 @@
+import { LineChartData } from 'react-native-chart-kit/dist/line-chart/LineChart';
 import {
   TransactionCategory,
   TransactionType,
 } from '../src/common/constants/enum';
+import { ChartData } from 'react-native-chart-kit/dist/HelperTypes';
+
 declare global {
   interface ITransaction {
     amount: string;
@@ -47,6 +50,7 @@ declare global {
     balance: number | null;
     totalTransactions: number | null;
     totalFees: number | null;
+    averagespending: number | null;
   }
   interface ITransactionTrend {
     label: string;
@@ -60,7 +64,8 @@ declare global {
     spendingByCategory: ITransactionTrend[];
   }
 
-  interface IStatCardPayload {
-    key: 'spendingByCategory' | 'spendingByPeriod';
-  }
+  type IStatsChartData = { key: 'spendingByCategory' | 'spendingByPeriod' } & (
+    | LineChartData
+    | ChartData
+  );
 }

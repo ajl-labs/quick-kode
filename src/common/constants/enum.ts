@@ -22,3 +22,9 @@ export enum USSDHandlerFormInputTypes {
   PHONE = 'phone',
   SELECTOR = 'selector',
 }
+
+export enum TransactionGranularity {
+  MONTH = 'month',
+  WEEK = 'week',
+  YEAR = 'year',
+}

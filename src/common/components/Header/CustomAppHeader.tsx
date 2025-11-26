@@ -15,7 +15,6 @@ export const CustomAppHeader: React.FC<CustomAppHeaderProps> = ({
   back,
   ...rest
 }) => {
-  console.log({ options, navigation, ...rest });
   const _goBack = () => {
     navigation.goBack();
   };

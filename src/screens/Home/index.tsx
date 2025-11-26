@@ -1,12 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Container } from '../../common/Container';
-import { Text, Button } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
 import globalStyles from '../../common/styles/global.styles';
 import { ThemeSpacings } from '../../config/theme';
-import { StatCard } from '../../common/components/Card/StatCard';
 import { HomeQuickActions } from './components/HomeQuickActions';
-import { formatCurrency } from '../../common/helpers/currency.helpers';
 import { useDispatch, useSelector } from 'react-redux';
 import { TransactionsList } from './components/TransactionsList';
 import { useNavigation } from '@react-navigation/native';
@@ -21,9 +19,20 @@ import {
   fetchTransactionStatsSummary,
 } from '../../store/features/transactions/transaction.thunk';
 import { AppDispatch } from '../../store';
-import { HomeStatsTrends } from './components/HomeStatsTrends';
-import { useFetchList } from '../../common/hooks/useFetch';
+import {
+  HomeStatsTrends,
+  HomeStatsTrendsHandles,
+} from './components/HomeStatsTrends';
+import { useFetch, useFetchList } from '../../common/hooks/useFetch';
 import { CustomButton } from '../../common/components/CustomButton';
+import {
+  HomeStateSummary,
+  HomeStateSummaryHandles,
+} from './components/HomeStatsSummary';
+import {
+  selectReportPeriod,
+  selectReportGranularity,
+} from '../../store/features/appConfig/app.config.slice';
 
 const styles = StyleSheet.create({
   quickActionContainer: {
@@ -31,21 +40,18 @@ const styles = StyleSheet.create({
     gap: ThemeSpacings.md,
     flexWrap: 'wrap',
   },
-  statSection: {
-    ...globalStyles.row,
-    flexWrap: 'wrap',
-    rowGap: ThemeSpacings.md,
-    columnGap: ThemeSpacings.md,
-  },
 });
 
 export const HomeScreen = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation();
+  const homeStatsSummaryRef = useRef<HomeStateSummaryHandles>(null);
+  const homeStatsTrendsRef = useRef<HomeStatsTrendsHandles>(null);
+
+  const reportPeriod = useSelector(selectReportPeriod);
+  const reportGranularity = useSelector(selectReportGranularity);
 
   const {
     data: transactions,
-    isLoading,
     isRefreshing,
     onRefresh,
   } = useFetchList({
@@ -57,18 +63,18 @@ export const HomeScreen = () => {
     },
   });
 
-  const transactionStats = useSelector(selectTransactionStatsSummary);
-
-  useEffect(() => {
-    dispatch(fetchTransactionStatsSummary());
-  }, []);
+  const handleRefresh = () => {
+    onRefresh();
+    homeStatsTrendsRef.current?.refresh();
+    homeStatsSummaryRef.current?.refresh();
+  };
 
   return (
     <Container style={globalStyles.noSpacing}>
       <TransactionsList
         data={transactions}
         refreshing={isRefreshing}
-        onRefresh={onRefresh}
+        onRefresh={handleRefresh}
         title="Recent Transactions"
         ListHeaderComponent={
           <View
@@ -78,17 +84,16 @@ export const HomeScreen = () => {
               globalStyles.fullWidth,
             ]}
           >
-            <View style={styles.statSection}>
-              <StatCard
-                title="Balance"
-                value={formatCurrency(transactionStats.balance)}
-              />
-              <StatCard
-                title="Fees"
-                value={formatCurrency(transactionStats.totalFees)}
-              />
-            </View>
-            <HomeStatsTrends />
+            <HomeStateSummary
+              ref={homeStatsSummaryRef}
+              granularity={reportGranularity}
+              reportPeriod={reportPeriod}
+            />
+            <HomeStatsTrends
+              ref={homeStatsTrendsRef}
+              granularity={reportGranularity}
+              reportPeriod={reportPeriod}
+            />
             <Text variant="titleMedium">Quick Actions</Text>
             <HomeQuickActions style={styles.quickActionContainer} />
             <View style={[globalStyles.spacedRow, globalStyles.fullWidth]}>

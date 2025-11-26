@@ -37,7 +37,8 @@ import DialPad from './dial-pad.svg';
 import AddBookmark from './add-bookmark.svg';
 import Bookmark from './bookmark.svg';
 import Search from './search.svg';
-
+import More from './more.svg';
+import Calendar from './calendar.svg';
 export const icons = {
   ArrowTopRight,
   ArrowBottomRight,
@@ -77,4 +78,6 @@ export const icons = {
   AddBookmark,
   Bookmark,
   Search,
+  More,
+  Calendar,
 };

@@ -77,3 +77,64 @@ export const useFetchList = <T>({
     ...loadingState,
   };
 };
+interface UseFetchProps<T, P> {
+  dataFetcher: AsyncThunk<any, any, any>;
+  queryParams?: P;
+  dataSelector: (state: any) => T;
+}
+
+export const useFetch = <T, P>({
+  queryParams,
+  dataFetcher,
+  dataSelector,
+}: UseFetchProps<T, P>) => {
+  const queryStringRef = useRef<string>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const [loadingState, setLoadingState] = useState<
+    Record<'isLoading' | 'isFetching' | 'isRefreshing', boolean>
+  >({
+    isFetching: false,
+    isLoading: false,
+    isRefreshing: false,
+  });
+  const data = useSelector(dataSelector);
+
+  const fetchData = useCallback(async () => {
+    try {
+      console.log('going to fetch data>>>>>>>>>>>>>>', queryParams);
+      await dispatch(dataFetcher(queryParams)).unwrap();
+    } catch (error) {
+      showAndroidToast('Error fetching data');
+    } finally {
+      setLoadingState({
+        isLoading: false,
+        isFetching: false,
+        isRefreshing: false,
+      });
+    }
+  }, [queryParams]);
+
+  const refresh = useCallback(() => {
+    setLoadingState(state => ({ ...state, isRefreshing: true }));
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    const queryParamString = JSON.stringify(queryParams || {});
+    if (
+      !queryStringRef.current ||
+      queryStringRef.current !== queryParamString
+    ) {
+      setLoadingState(state => ({ ...state, isLoading: true }));
+      queryStringRef.current = queryParamString;
+      fetchData();
+    }
+  }, [queryParams]);
+
+  return {
+    data,
+    fetchData,
+    refresh,
+    ...loadingState,
+  };
+};

@@ -17,7 +17,6 @@ import {
   removePendingBackgroundTransaction,
 } from '../../../service/background.transaction';
 import { updateTransactionState } from './transaction.slice';
-import { isEmpty } from '../../../common/helpers';
 
 export const postTransactionData = createAsyncThunk(
   'history/postTransactionData',
@@ -47,7 +46,7 @@ export const postTransactionData = createAsyncThunk(
         dispatch(
           removePostTransactionRequest({ key: transactionData.messageId }),
         );
-        dispatch(fetchTransactionStatsSummary());
+        dispatch(fetchTransactionStatsSummary({}));
       }
 
       return data;
@@ -90,7 +89,7 @@ export const postTransactionData = createAsyncThunk(
 
 export const postPendingTransactions = createAsyncThunk(
   'transactions/postPendingTransactions',
-  async (_, { getState, dispatch }) => {
+  async (_, { dispatch }) => {
     try {
       const transactions = await getPendingBackgroundTransactions();
       console.log(`pending transactions: ${Object.keys(transactions).length}`);
@@ -117,7 +116,6 @@ export const fetchTransactionData = createAsyncThunk(
   'history/fetchTransactionData',
   async (queryParams: IPaginatedFetchParams, { getState }) => {
     try {
-      console.log('Fetching transaction data from webhook...', queryParams);
       const { webhookAuth, webhooks } = (getState() as RootState).settings;
       let { url } = webhooks[WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT] || {};
       if (!url) return;
@@ -181,13 +179,16 @@ export const updateTransactionData = createAsyncThunk(
 
 export const fetchTransactionStatsSummary = createAsyncThunk(
   'stats/fetchTransactionStatsSummary',
-  async (_, { getState }) => {
+  async (option: IReportQueryParams, { getState }) => {
     try {
-      const { webhookAuth, webhooks } = (getState() as RootState).settings;
+      const {
+        settings: { webhookAuth, webhooks },
+      } = getState() as RootState;
       const { url } = webhooks[WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT] || {};
       if (!url) return;
       const { data } = await axios.get(`${url.trim()}/stats/summary`, {
         auth: webhookAuth,
+        params: option,
       });
       return data;
     } catch (error) {
@@ -206,13 +207,17 @@ export const fetchTransactionStatsSummary = createAsyncThunk(
 
 export const fetchTransactionStatsTrends = createAsyncThunk(
   'stats/fetchTransactionStatsTrends',
-  async (_, { getState }) => {
+  async (options: IReportQueryParams, { getState }) => {
     try {
-      const { webhookAuth, webhooks } = (getState() as RootState).settings;
+      const {
+        settings: { webhookAuth, webhooks },
+        config,
+      } = getState() as RootState;
       const { url } = webhooks[WEBHOOK_ACTIONS_KEY.TRANSACTION_ENDPOINT] || {};
       if (!url) return;
       const { data } = await axios.get(`${url.trim()}/stats/trends`, {
         auth: webhookAuth,
+        params: options,
       });
       return data;
     } catch (error) {
