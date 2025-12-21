@@ -52,7 +52,13 @@ export const USSDHandlerForm: React.FC<USSDHandlerFormProps> = ({
       setLabels(prev => ({ ...prev, [variableName]: phoneResults.name }));
     }
     if (phoneResults?.phoneNumber) {
-      formikRef.current?.setFieldValue(variableName, phoneResults.phoneNumber);
+      formikRef.current?.setFieldValue(
+        variableName,
+        phoneResults.phoneNumber
+          .replace('+250', '0')
+          .replaceAll(' ', '')
+          .trim(),
+      );
     }
   };
 
